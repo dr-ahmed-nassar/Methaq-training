@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZmedCoach — نشاط خريطة المخاوف والثقة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --bg:    #EEF4FB;
+  --white: #FFFFFF;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--navy);
+  direction: rtl;
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: var(--navy);
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:44px;
+  background: var(--bg);
+  clip-path: polygon(0 60%, 100% 0, 100% 100%, 0 100%);
+}
+.header-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+  position: relative; z-index: 2;
+}
+.logo-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 22px;
+}
+.logo-box {
+  width: 40px; height: 40px;
+  background: #fff; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 900; color: var(--red);
+}
+.logo-text .en { font-size: 17px; font-weight: 900; color: #fff; }
+.logo-text .en span { color: var(--red); }
+.logo-text .ar { font-size: 10px; color: rgba(255,255,255,0.65); }
+
+.header-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--red);
+  color: #fff; font-size: 13px; font-weight: 700;
+  padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 12px;
+}
+.header h1 { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 6px; line-height: 1.3; }
+.header h1 span { color: var(--gold); }
+.header p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.7; }
+
+/* ===== GROUP SELECTOR ===== */
+.group-selector {
+  max-width: 780px; margin: 0 auto;
+  padding: 0 24px; margin-top: -16px;
+  position: relative; z-index: 5;
+}
+.group-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.group-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 2.5px solid var(--border);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 14px;
+}
+.group-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(45,125,210,0.12); }
+.group-card.selected { border-color: var(--navy); background: #f0f6fd; }
+.group-card .gc-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+}
+.group-card.g1 .gc-icon { background: rgba(45,125,210,0.12); }
+.group-card.g2 .gc-icon { background: rgba(230,57,70,0.1); }
+.group-card .gc-info .gt { font-size: 16px; font-weight: 800; }
+.group-card.g1 .gc-info .gt { color: var(--blue); }
+.group-card.g2 .gc-info .gt { color: var(--red); }
+.group-card .gc-info .gs { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ===== FORM ===== */
+.form-wrap {
+  max-width: 780px; margin: 20px auto 60px;
+  padding: 0 24px;
+}
+
+.activity-info {
+  background: var(--navy);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.ai-icon { font-size: 28px; flex-shrink: 0; }
+.ai-text .ait { font-size: 15px; font-weight: 800; color: #fff; }
+.ai-text .ais { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 2px; line-height: 1.5; }
+.ai-timer {
+  margin-right: auto;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 14px; font-weight: 900;
+  padding: 8px 16px; border-radius: 10px;
+  text-align: center; flex-shrink: 0;
+}
+.ai-timer .tv { font-size: 22px; display: block; }
+
+.section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 16px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 3px 16px rgba(27,58,92,0.05);
+}
+.sec-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 2px solid var(--bg);
+}
+.sec-num {
+  width: 36px; height: 36px;
+  background: var(--navy); color: #fff;
+  border-radius: 9px; font-size: 15px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sec-title { font-size: 18px; font-weight: 800; color: var(--navy); }
+.sec-title span { color: var(--red); }
+
+/* ===== FIELDS ===== */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label { font-size: 14px; font-weight: 700; color: var(--navy); }
+.field label .req { color: var(--red); }
+.field input, .field select, .field textarea {
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px; color: var(--navy);
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 11px 14px;
+  outline: none; transition: all 0.2s; direction: rtl; width: 100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(45,125,210,0.1);
+  background: #fff;
+}
+.field textarea { min-height: 90px; resize: vertical; }
+.field .hint { font-size: 12px; color: var(--muted); }
+
+/* ===== FEARS ROWS ===== */
+.fears-container { display: flex; flex-direction: column; gap: 10px; }
+.fear-row {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;
+  gap: 8px; align-items: center;
+}
+.fear-row .arrow {
+  text-align: center; font-size: 18px; color: var(--blue);
+  font-weight: 900;
+}
+.fear-input {
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px; color: var(--navy);
+  border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  outline: none; transition: all 0.2s;
+  direction: rtl; width: 100%;
+  background: var(--bg);
+}
+.fear-input.left { background: #FFF0F1; border-color: #F5C0C4; }
+.fear-input.right { background: #F0F8FF; border-color: var(--border); }
+.fear-input:focus { border-color: var(--blue); background: #fff; box-shadow: 0 0 0 2px rgba(45,125,210,0.1); }
+.fear-input.left:focus { border-color: var(--red); background: #fff; box-shadow: 0 0 0 2px rgba(230,57,70,0.1); }
+
+.fears-header {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;
+  gap: 8px; margin-bottom: 8px;
+}
+.fears-header .fh {
+  font-size: 12px; font-weight: 800;
+  text-align: center; padding: 6px 10px;
+  border-radius: 6px;
+}
+.fh.red-h { background: rgba(230,57,70,0.1); color: var(--red); }
+.fh.blue-h { background: rgba(45,125,210,0.1); color: var(--blue); }
+
+.add-fear-btn {
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--blue); background: rgba(45,125,210,0.08);
+  border: 1.5px dashed var(--blue);
+  border-radius: 8px; padding: 9px;
+  cursor: pointer; width: 100%; margin-top: 6px;
+  transition: all 0.2s;
+}
+.add-fear-btn:hover { background: rgba(45,125,210,0.14); }
+
+/* ===== INSIGHT ===== */
+.insight-box {
+  background: var(--bg); border-radius: 10px;
+  border: 1.5px solid var(--border);
+  padding: 12px 14px; margin-top: 10px;
+}
+.insight-box .ibl { font-size: 12px; font-weight: 800; color: var(--gold); margin-bottom: 5px; }
+.insight-box textarea {
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px; color: var(--navy);
+  background: transparent; border: none;
+  outline: none; width: 100%;
+  resize: none; min-height: 60px; direction: rtl;
+}
+
+/* ===== SUBMIT ===== */
+.submit-row {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-top: 8px;
+}
+.submit-note { font-size: 12px; color: var(--muted); }
+.btn-submit {
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px; font-weight: 800;
+  background: var(--red); color: #fff;
+  border: none; border-radius: 12px;
+  padding: 14px 40px; cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-submit:hover { background: #c92d38; transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ===== SUCCESS ===== */
+.success-screen {
+  display: none; text-align: center;
+  padding: 60px 24px; max-width: 500px; margin: 0 auto;
+}
+.success-screen.show { display: block; }
+.success-icon {
+  width: 88px; height: 88px;
+  background: linear-gradient(135deg, var(--blue), var(--navy));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px; margin: 0 auto 20px;
+  animation: pop 0.5s ease;
+}
+@keyframes pop { 0%{transform:scale(0)} 80%{transform:scale(1.1)} 100%{transform:scale(1)} }
+.success-screen h2 { font-size: 26px; font-weight: 900; color: var(--navy); margin-bottom: 10px; }
+.success-screen p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--navy); color: #fff;
+  padding: 13px 26px; border-radius: 12px;
+  font-size: 14px; font-weight: 600; z-index: 999;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+.toast.err { background: var(--red); }
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center; padding: 24px;
+  font-size: 13px; color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+footer span { color: var(--red); font-weight: 700; }
+
+/* ===== WHATSAPP TIP ===== */
+.wa-tip {
+  background: #E7F5EC;
+  border: 1.5px solid #A8D8B2;
+  border-radius: 12px; padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.wa-tip .wt { font-size: 28px; }
+.wa-tip .wtext .wtt { font-size: 14px; font-weight: 800; color: #1A6B32; }
+.wa-tip .wtext .wts { font-size: 12px; color: #2E7D42; margin-top: 2px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo-box">Z</div>
+      <div class="logo-text">
+        <div class="en"><span>Z</span>medCoach</div>
+        <div class="ar">زمدكوتش للتدريب</div>
+      </div>
+    </div>
+    <div class="header-badge">📋 نشاط تفاعلي — الدرس الأول</div>
+    <h1>خريطة <span>المخاوف</span> والثقة</h1>
+    <p>تناقشوا في جروب الواتساب ← سجّل ممثل المجموعة المخرجات هنا<br>عملاء ميثاق للتدريب</p>
+  </div>
+</div>
+
+<!-- GROUP SELECTOR -->
+<div class="group-selector">
+  <div class="group-cards">
+    <div class="group-card g1" id="gc1" onclick="selectGroup(1)">
+      <div class="gc-icon">🔵</div>
+      <div class="gc-info">
+        <div class="gt">المجموعة الأولى</div>
+        <div class="gs">Group 1 — الفريق الأزرق</div>
+      </div>
+    </div>
+    <div class="group-card g2" id="gc2" onclick="selectGroup(2)">
+      <div class="gc-icon">🔴</div>
+      <div class="gc-info">
+        <div class="gt">المجموعة الثانية</div>
+        <div class="gs">Group 2 — الفريق الأحمر</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="formWrap" style="display:none;">
+
+  <!-- واتساب تيب -->
+  <div class="wa-tip">
+    <div class="wt">💬</div>
+    <div class="wtext">
+      <div class="wtt">تناقشتوا على جروب الواتساب؟ سجّل المخرجات هنا</div>
+      <div class="wts">ممثل المجموعة يملأ مخاوف عملاء ميثاق للتدريب ثم يضغط إرسال</div>
+    </div>
+  </div>
+
+  <!-- معلومات النشاط -->
+  <div class="activity-info">
+    <div class="ai-icon">🎯</div>
+    <div class="ai-text">
+      <div class="ait">خريطة المخاوف والثقة — Breakout</div>
+      <div class="ais">اكتبوا ٥ مخاوف يراها عميل ميثاق للتدريب عند شراء البرامج<br>وقابلوا كل مخاوف بـ "دليل أو خطوة" تقلل هذه المخاوف</div>
+    </div>
+    <div class="ai-timer">
+      <span class="tv">١٥</span>
+      دقيقة
+    </div>
+  </div>
+
+  <!-- القسم الأول: بيانات الممثل -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">١</div>
+      <div class="sec-title">بيانات <span>ممثل المجموعة</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="field">
+        <label>اسم ممثل المجموعة <span class="req">*</span></label>
+        <input type="text" id="repName" placeholder="اسمك">
+      </div>
+      <div class="field">
+        <label>المجموعة المختارة</label>
+        <input type="text" id="groupLabel" readonly style="background:#f0f0f0;">
+      </div>
+    </div>
+  </div>
+
+  <!-- القسم الثاني: خريطة المخاوف والثقة -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٢</div>
+      <div class="sec-title">خريطة <span>المخاوف</span> ← ردود الثقة</div>
+    </div>
+
+    <div class="fears-header">
+      <div class="fh red-h">⚠️ مخاوف العميل</div>
+      <div></div>
+      <div class="fh blue-h">✅ رد الثقة / الدليل</div>
+    </div>
+
+    <div class="fears-container" id="fearsContainer">
+      <!-- Rows generated by JS -->
+    </div>
+
+    <button class="add-fear-btn" onclick="addFearRow()">+ أضف مخوفاً آخر</button>
+  </div>
+
+  <!-- القسم الثالث: أصعب مخوف -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٣</div>
+      <div class="sec-title">التحليل <span>والاستنتاج</span></div>
+    </div>
+
+    <div class="field">
+      <label>ما أصعب المخاوف التي لم تجدوا لها رداً واضحاً؟ <span class="req">*</span></label>
+      <textarea id="hardestFear" placeholder="اذكر المخاوف التي أربكت المجموعة أكثر..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>ما أقوى رد ثقة توصلت إليه المجموعة؟</label>
+      <textarea id="bestTrust" placeholder="اذكر الدليل أو الجملة التي رأت المجموعة أنها الأقوى..."></textarea>
+    </div>
+
+    <div class="insight-box">
+      <div class="ibl">💡 استنتاج المجموعة</div>
+      <textarea id="insight" placeholder="ما الدرس الأساسي الذي خرجتم به من النشاط؟"></textarea>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-row">
+    <div class="submit-note">سيتم إرسال النتائج للمدرب + تحميل Excel</div>
+    <button class="btn-submit" id="submitBtn" onclick="submitActivity()">
+      إرسال نتائج المجموعة 📤
+    </button>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>تم إرسال نتائج مجموعتك!</h2>
+  <p>استلم المدرب نتائجكم وسيناقشها مع الكل عند العودة من الـ Breakout.<br><br>يمكنكم الآن العودة للمحادثة الرئيسية.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>ZmedCoach © 2026 — <span>زمدكوتش للتدريب</span></footer>
+
+<script>
+// ===== CONFIG =====
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ===== STATE =====
+let selectedGroup = null;
+let fearCount = 0;
+
+// ===== SELECT GROUP =====
+function selectGroup(n) {
+  selectedGroup = n;
+  document.getElementById('gc1').classList.toggle('selected', n === 1);
+  document.getElementById('gc2').classList.toggle('selected', n === 2);
+  document.getElementById('groupLabel').value = n === 1 ? 'المجموعة الأولى 🔵' : 'المجموعة الثانية 🔴';
+  document.getElementById('formWrap').style.display = 'block';
+  document.getElementById('formWrap').scrollIntoView({ behavior: 'smooth' });
+
+  // إضافة ٥ صفوف تلقائياً
+  if (fearCount === 0) {
+    for (let i = 0; i < 5; i++) addFearRow();
+  }
+}
+
+// ===== ADD FEAR ROW =====
+function addFearRow() {
+  fearCount++;
+  const c = document.getElementById('fearsContainer');
+  const row = document.createElement('div');
+  row.className = 'fear-row';
+  row.id = 'fear-' + fearCount;
+  row.innerHTML = `
+    <input class="fear-input left" type="text"
+      placeholder="المخاوف ${fearCount}..."
+      id="f-fear-${fearCount}">
+    <div class="arrow">←</div>
+    <input class="fear-input right" type="text"
+      placeholder="رد الثقة / الدليل..."
+      id="f-trust-${fearCount}">
+  `;
+  c.appendChild(row);
+}
+
+// ===== COLLECT DATA =====
+function collectData() {
+  const fears = [];
+  for (let i = 1; i <= fearCount; i++) {
+    const f = document.getElementById('f-fear-' + i);
+    const t = document.getElementById('f-trust-' + i);
+    if (f && f.value.trim()) {
+      fears.push({ fear: f.value.trim(), trust: t ? t.value.trim() : '' });
+    }
+  }
+  return {
+    timestamp:   new Date().toLocaleString('ar-EG'),
+    group:       selectedGroup === 1 ? 'المجموعة الأولى' : 'المجموعة الثانية',
+    rep:         document.getElementById('repName').value.trim(),
+    fears,
+    hardestFear: document.getElementById('hardestFear').value.trim(),
+    bestTrust:   document.getElementById('bestTrust').value.trim(),
+    insight:     document.getElementById('insight').value.trim(),
+  };
+}
+
+// ===== FORMAT FOR EMAIL =====
+function formatEmail(d) {
+  const fearsText = d.fears.map((f, i) =>
+    `${i+1}. ❌ ${f.fear}\n   ✅ ${f.trust || 'لا يوجد رد'}`
+  ).join('\n');
+
+  return `
+━━━━━━━━━━━━━━━━━━━━━━
+📋 نتائج نشاط — خريطة المخاوف والثقة
+━━━━━━━━━━━━━━━━━━━━━━
+🕐 ${d.timestamp}
+👥 ${d.group}
+🙋 ممثل المجموعة: ${d.rep}
+
+━━━ خريطة المخاوف ← الثقة ━━━
+${fearsText}
+
+━━━ التحليل ━━━
+⚠️ أصعب المخاوف: ${d.hardestFear}
+⭐ أقوى رد ثقة: ${d.bestTrust}
+💡 الاستنتاج: ${d.insight}
+━━━━━━━━━━━━━━━━━━━━━━
+  `.trim();
+}
+
+// ===== DOWNLOAD EXCEL =====
+function downloadExcel(d) {
+  const rows = [
+    ['المجموعة', 'الممثل', 'المخاوف', 'رد الثقة', 'التاريخ'],
+    ...d.fears.map(f => [d.group, d.rep, f.fear, f.trust, d.timestamp]),
+    [],
+    ['أصعب المخاوف', d.hardestFear],
+    ['أقوى رد ثقة', d.bestTrust],
+    ['الاستنتاج', d.insight],
+  ];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:16},{wch:16},{wch:24},{wch:36},{wch:36},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws, 'المخاوف والثقة');
+  XLSX.writeFile(wb, `ZmedCoach_Activity_${d.group}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ===== VALIDATE =====
+function validate(d) {
+  if (!selectedGroup)    return toast('اختر مجموعتك أولاً', true);
+  if (!d.rep)            return toast('اكتب اسم ممثل المجموعة', true);
+  if (d.fears.length < 1) return toast('سجّل مخوفاً واحداً على الأقل', true);
+  if (!d.hardestFear)    return toast('اذكر أصعب مخوف واجهتم', true);
+  return true;
+}
+
+// ===== SUBMIT =====
+async function submitActivity() {
+  const d = collectData();
+  if (!validate(d)) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:     TRAINER_EMAIL,
+      group:        d.group,
+      rep_name:     d.rep,
+      members:      d.members,
+      full_summary: formatEmail(d),
+      timestamp:    d.timestamp,
+    });
+    downloadExcel(d);
+    showSuccess();
+  } catch (err) {
+    console.error(err);
+    // حتى لو الإيميل فشل — حمّل الـ Excel
+    downloadExcel(d);
+    toast('تم حفظ Excel — راجع إعداد EmailJS', true);
+    btn.disabled = false;
+    btn.textContent = 'إرسال نتائج المجموعة 📤';
+  }
+}
+
+function showSuccess() {
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+  document.querySelector('.group-selector').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 3500);
+  return false;
+}
+</script>
+</body>
+</html>
