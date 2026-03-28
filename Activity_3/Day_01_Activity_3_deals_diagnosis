@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نشاط — أين تضيع صفقاتك؟</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --bg:    #EEF4FB;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Cairo',sans-serif;
+  background:var(--bg); color:var(--navy);
+  direction:rtl; min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+.header { background:var(--navy); position:relative; overflow:hidden; }
+.header::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:48px;
+  background:var(--bg);
+  clip-path:polygon(0 65%, 100% 0, 100% 100%, 0 100%);
+}
+.header-inner {
+  max-width:800px; margin:0 auto;
+  padding:28px 24px 64px;
+  position:relative; z-index:2;
+}
+.logo-row { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.logo-box {
+  width:40px; height:40px; background:#fff;
+  border-radius:8px; display:flex; align-items:center;
+  justify-content:center; font-size:20px; font-weight:900; color:var(--red);
+}
+.logo-text .en { font-size:17px; font-weight:900; color:#fff; }
+.logo-text .en span { color:var(--red); }
+.logo-text .ar { font-size:10px; color:rgba(255,255,255,0.6); }
+.h-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--red); color:#fff;
+  font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:20px; margin-bottom:12px;
+}
+.header h1 { font-size:24px; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.3; }
+.header h1 span { color:var(--gold); }
+.header p { font-size:13px; color:rgba(255,255,255,0.72); line-height:1.7; }
+
+/* ===== TIMER BANNER ===== */
+.timer-banner {
+  max-width:800px; margin:0 auto;
+  padding:0 24px; margin-top:-18px;
+  position:relative; z-index:5;
+}
+.timer-card {
+  background:#fff; border-radius:14px;
+  border:1.5px solid var(--border);
+  box-shadow:0 4px 20px rgba(27,58,92,0.1);
+  display:flex; overflow:hidden;
+}
+.tc-total {
+  background:var(--navy); padding:16px 20px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:2px; flex-shrink:0;
+}
+.tc-total .tt { font-size:10px; color:var(--gold); font-weight:700; }
+.tc-total .tv { font-size:26px; font-weight:900; color:#fff; line-height:1; }
+.tc-total .ts { font-size:10px; color:rgba(255,255,255,0.6); }
+.tc-parts { flex:1; display:flex; }
+.tc-part {
+  flex:1; padding:12px 16px;
+  border-right:1px solid var(--bg);
+  display:flex; flex-direction:column; gap:2px;
+}
+.tc-part:last-child { border-right:none; }
+.tp-badge {
+  display:inline-block; font-size:10px; font-weight:800;
+  color:#fff; padding:2px 8px; border-radius:4px; margin-bottom:3px;
+}
+.tp-title { font-size:13px; font-weight:800; color:var(--navy); }
+.tp-time  { font-size:11px; color:var(--red); font-weight:700; }
+.tp-desc  { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
+
+/* ===== STAGES REFERENCE ===== */
+.stages-ref {
+  max-width:800px; margin:16px auto 0;
+  padding:0 24px;
+}
+.stages-card {
+  background:#fff; border-radius:14px;
+  border:1.5px solid var(--border); padding:14px 18px;
+}
+.stages-label {
+  font-size:12px; font-weight:800; color:var(--navy);
+  margin-bottom:10px; display:flex; align-items:center; gap:6px;
+}
+.stages-list {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+}
+@media(max-width:600px){ .stages-list { grid-template-columns:repeat(2,1fr); } }
+.stage-pill {
+  display:flex; align-items:center; gap:6px;
+  padding:7px 10px; border-radius:8px;
+  border:1.5px solid var(--border);
+  background:var(--bg); cursor:default;
+}
+.stage-pill .sp-n {
+  width:22px; height:22px; border-radius:6px;
+  background:var(--navy); color:#fff;
+  font-size:11px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.stage-pill .sp-t { font-size:11px; font-weight:700; color:var(--navy); }
+
+/* ===== FORM ===== */
+.form-wrap {
+  max-width:800px; margin:16px auto 60px;
+  padding:0 24px;
+  display:flex; flex-direction:column; gap:16px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  background:#fff; border-radius:16px;
+  border:1.5px solid var(--border); overflow:hidden;
+  box-shadow:0 3px 14px rgba(27,58,92,0.05);
+}
+.sec-head {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 20px; border-bottom:2px solid var(--bg);
+}
+.sec-num {
+  width:34px; height:34px; background:var(--navy);
+  color:#fff; border-radius:8px; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.sec-title { font-size:17px; font-weight:800; color:var(--navy); }
+.sec-title span { color:var(--red); }
+.sec-timer {
+  margin-right:auto;
+  background:rgba(230,57,70,0.1); color:var(--red);
+  font-size:12px; font-weight:700;
+  padding:4px 12px; border-radius:20px; white-space:nowrap;
+}
+.sec-body { padding:20px; display:flex; flex-direction:column; gap:14px; }
+
+/* ===== WARNING ===== */
+.warn-box {
+  background:rgba(230,57,70,0.06);
+  border:1.5px solid rgba(230,57,70,0.25);
+  border-radius:10px; padding:12px 16px;
+  display:flex; align-items:flex-start; gap:10px;
+}
+.warn-box .wi { font-size:18px; flex-shrink:0; }
+.warn-box .wt { font-size:13px; font-weight:700; color:var(--red); }
+.warn-box .ws { font-size:12px; color:var(--muted); margin-top:2px; line-height:1.5; }
+
+/* ===== DEAL CARDS ===== */
+.deals-grid { display:flex; flex-direction:column; gap:14px; }
+.deal-card { border-radius:12px; overflow:hidden; border:1.5px solid var(--border); }
+.deal-head {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 16px; background:var(--navy);
+}
+.deal-num {
+  width:28px; height:28px; border-radius:7px;
+  background:var(--gold); color:var(--navy);
+  font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.deal-label { font-size:14px; font-weight:800; color:#fff; }
+.deal-body {
+  padding:14px 16px; background:#fff;
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+@media(max-width:580px){ .deal-body { grid-template-columns:1fr; } }
+.deal-field { display:flex; flex-direction:column; gap:4px; }
+.deal-field label { font-size:12px; font-weight:700; color:var(--navy); }
+.deal-field select, .deal-field textarea, .deal-field input {
+  font-family:'Cairo',sans-serif; font-size:12px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:8px; padding:8px 10px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+}
+.deal-field textarea { min-height:64px; resize:vertical; }
+.deal-field select:focus,
+.deal-field textarea:focus,
+.deal-field input:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(45,125,210,0.1); background:#fff;
+}
+.deal-field.full { grid-column:1/-1; }
+
+/* ===== COMMITMENT ===== */
+.commit-box {
+  background:linear-gradient(135deg, var(--navy), #0f2238);
+  border-radius:12px; padding:16px 18px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.commit-label { font-size:13px; font-weight:800; color:var(--gold); }
+.commit-hint  { font-size:12px; color:rgba(255,255,255,0.6); }
+.commit-field { display:flex; flex-direction:column; gap:6px; }
+.commit-field label { font-size:12px; font-weight:700; color:#fff; }
+.commit-input, .commit-select {
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:#fff; border:1.5px solid rgba(255,255,255,0.2);
+  border-radius:8px; padding:9px 12px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+}
+.commit-input:focus, .commit-select:focus {
+  border-color:var(--gold); box-shadow:0 0 0 2px rgba(200,169,110,0.2);
+}
+
+/* ===== SUBMIT ===== */
+.submit-area {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 20px; background:var(--bg); border-top:2px solid var(--border);
+}
+.submit-note { font-size:12px; color:var(--muted); max-width:380px; line-height:1.5; }
+.btn-submit {
+  font-family:'Cairo',sans-serif; font-size:15px; font-weight:800;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:13px 36px; cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.btn-submit:hover { background:#c92d38; transform:translateY(-1px); }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* ===== SUCCESS ===== */
+.success-screen {
+  display:none; text-align:center;
+  padding:60px 24px; max-width:520px; margin:0 auto;
+}
+.success-screen.show { display:block; }
+.success-icon {
+  width:88px; height:88px;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:38px;
+  margin:0 auto 20px; animation:pop 0.5s ease;
+}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success-screen h2 { font-size:24px; font-weight:900; color:var(--navy); margin-bottom:10px; }
+.success-screen p  { font-size:13px; color:var(--muted); line-height:1.7; }
+.commit-preview {
+  background:var(--navy); border-radius:12px;
+  padding:16px 20px; margin:16px 0; text-align:right;
+}
+.commit-preview .cp-l { font-size:11px; font-weight:800; color:var(--gold); margin-bottom:6px; }
+.commit-preview .cp-t { font-size:14px; font-weight:700; color:#fff; line-height:1.7; }
+.commit-preview .cp-t span { color:var(--gold); }
+
+/* ===== TOAST ===== */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:#fff;
+  padding:12px 24px; border-radius:12px;
+  font-size:13px; font-weight:600; z-index:999;
+  box-shadow:0 6px 24px rgba(0,0,0,0.2);
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+.toast.err { background:var(--red); }
+
+footer {
+  text-align:center; padding:24px;
+  font-size:12px; color:var(--muted);
+  border-top:1px solid var(--border);
+}
+footer span { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo-box">Z</div>
+      <div class="logo-text">
+        <div class="en"><span>Z</span>medCoach</div>
+        <div class="ar">زمدكوتش للتدريب</div>
+      </div>
+    </div>
+    <div class="h-badge">🔍 نشاط تشخيص — الدرس الرابع</div>
+    <h1>أين <span>تضيع</span> صفقاتك؟</h1>
+    <p>تشخيص شخصي صادق لآخر ٣ صفقات لم تكتمل — والخطوة التصحيحية لكل منها</p>
+  </div>
+</div>
+
+<!-- TIMER BANNER -->
+<div class="timer-banner">
+  <div class="timer-card">
+    <div class="tc-total">
+      <div class="tt">⏱ الوقت الكلي</div>
+      <div class="tv">١٢</div>
+      <div class="ts">دقيقة</div>
+    </div>
+    <div class="tc-parts">
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--navy);">الجزء ١</div>
+        <div class="tp-title">التشخيص الشخصي</div>
+        <div class="tp-time">⏱ ٧ دقائق</div>
+        <div class="tp-desc">آخر ٣ صفقات — المرحلة — المخرج الناقص — الإجراء التصحيحي</div>
+      </div>
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--red);">الجزء ٢</div>
+        <div class="tp-title">المشاركة الجماعية</div>
+        <div class="tp-time">⏱ ٥ دقائق</div>
+        <div class="tp-desc">أكثر المراحل تكراراً في الفريق + خطوة تحسين هذا الأسبوع</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STAGES REFERENCE -->
+<div class="stages-ref">
+  <div class="stages-card">
+    <div class="stages-label">📋 مراجعة سريعة — مراحل البيع الـ ٨</div>
+    <div class="stages-list">
+      <div class="stage-pill"><div class="sp-n">١</div><div class="sp-t">Lead Generation</div></div>
+      <div class="stage-pill"><div class="sp-n">٢</div><div class="sp-t">Qualification</div></div>
+      <div class="stage-pill"><div class="sp-n">٣</div><div class="sp-t">Discovery</div></div>
+      <div class="stage-pill"><div class="sp-n">٤</div><div class="sp-t">Presentation</div></div>
+      <div class="stage-pill"><div class="sp-n">٥</div><div class="sp-t">Objection Handling</div></div>
+      <div class="stage-pill"><div class="sp-n">٦</div><div class="sp-t">Negotiation</div></div>
+      <div class="stage-pill"><div class="sp-n">٧</div><div class="sp-t">Closing</div></div>
+      <div class="stage-pill"><div class="sp-n">٨</div><div class="sp-t">Follow-up</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="formWrap">
+
+  <!-- بيانات المتدرب -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">١</div>
+      <div class="sec-title">بيانات <span>المتدرب</span></div>
+    </div>
+    <div class="sec-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:13px;font-weight:700;color:var(--navy);">اسمك الكامل <span style="color:var(--red);">*</span></label>
+          <input type="text" id="name" placeholder="اسمك"
+            style="font-family:'Cairo',sans-serif;font-size:13px;color:var(--navy);background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;outline:none;direction:rtl;width:100%;transition:all 0.2s;">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:13px;font-weight:700;color:var(--navy);">المسمى الوظيفي</label>
+          <input type="text" id="jobTitle" placeholder="مثال: مستشار مبيعات"
+            style="font-family:'Cairo',sans-serif;font-size:13px;color:var(--navy);background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;outline:none;direction:rtl;width:100%;transition:all 0.2s;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- التشخيص الشخصي -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٢</div>
+      <div class="sec-title">التشخيص <span>الشخصي</span> — آخر ٣ صفقات</div>
+      <div class="sec-timer">⏱ ٧ دقائق</div>
+    </div>
+    <div class="sec-body">
+
+      <div class="warn-box">
+        <div class="wi">⚠️</div>
+        <div>
+          <div class="wt">كن صريحاً — التشخيص الصادق هو بداية التحسين</div>
+          <div class="ws">لا أحد يحكم — هذا النشاط لمصلحتك أنت. الصراحة = تحسين حقيقي</div>
+        </div>
+      </div>
+
+      <div class="deals-grid">
+
+        <!-- صفقة ١ -->
+        <div class="deal-card">
+          <div class="deal-head">
+            <div class="deal-num">١</div>
+            <div class="deal-label">الصفقة الأولى</div>
+          </div>
+          <div class="deal-body">
+            <div class="deal-field">
+              <label>نوع العميل / القطاع</label>
+              <input type="text" id="d1_client" placeholder="مثال: شركة تجزئة / B2B">
+            </div>
+            <div class="deal-field">
+              <label>المرحلة التي توقفت فيها الصفقة <span style="color:var(--red);">*</span></label>
+              <select id="d1_stage">
+                <option value="">اختر المرحلة</option>
+                <option>١ — Lead Generation</option>
+                <option>٢ — Qualification</option>
+                <option>٣ — Discovery</option>
+                <option>٤ — Presentation</option>
+                <option>٥ — Objection Handling</option>
+                <option>٦ — Negotiation</option>
+                <option>٧ — Closing</option>
+                <option>٨ — Follow-up</option>
+              </select>
+            </div>
+            <div class="deal-field">
+              <label>ما المخرج الذي كان ناقصاً؟ <span style="color:var(--red);">*</span></label>
+              <textarea id="d1_missing" placeholder="مثال: لم يكن عندي بيان احتياج مكتوب — أرسلت Proposal بدون Discovery كافٍ..."></textarea>
+            </div>
+            <div class="deal-field">
+              <label>الإجراء التصحيحي لو عدت الآن</label>
+              <textarea id="d1_action" placeholder="مثال: كنت سأسأل ٣ أسئلة اكتشاف إضافية قبل إرسال العرض..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- صفقة ٢ -->
+        <div class="deal-card">
+          <div class="deal-head">
+            <div class="deal-num">٢</div>
+            <div class="deal-label">الصفقة الثانية</div>
+          </div>
+          <div class="deal-body">
+            <div class="deal-field">
+              <label>نوع العميل / القطاع</label>
+              <input type="text" id="d2_client" placeholder="مثال: شركة صناعية / B2B">
+            </div>
+            <div class="deal-field">
+              <label>المرحلة التي توقفت فيها الصفقة <span style="color:var(--red);">*</span></label>
+              <select id="d2_stage">
+                <option value="">اختر المرحلة</option>
+                <option>١ — Lead Generation</option>
+                <option>٢ — Qualification</option>
+                <option>٣ — Discovery</option>
+                <option>٤ — Presentation</option>
+                <option>٥ — Objection Handling</option>
+                <option>٦ — Negotiation</option>
+                <option>٧ — Closing</option>
+                <option>٨ — Follow-up</option>
+              </select>
+            </div>
+            <div class="deal-field">
+              <label>ما المخرج الذي كان ناقصاً؟ <span style="color:var(--red);">*</span></label>
+              <textarea id="d2_missing" placeholder="مثال: لم أحدد صاحب القرار الحقيقي في بداية المحادثة..."></textarea>
+            </div>
+            <div class="deal-field">
+              <label>الإجراء التصحيحي لو عدت الآن</label>
+              <textarea id="d2_action" placeholder="مثال: كنت سأسأل مبكراً 'مين غيرك يشارك في القرار؟'..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- صفقة ٣ -->
+        <div class="deal-card">
+          <div class="deal-head">
+            <div class="deal-num">٣</div>
+            <div class="deal-label">الصفقة الثالثة</div>
+          </div>
+          <div class="deal-body">
+            <div class="deal-field">
+              <label>نوع العميل / القطاع</label>
+              <input type="text" id="d3_client" placeholder="مثال: فرد / B2C">
+            </div>
+            <div class="deal-field">
+              <label>المرحلة التي توقفت فيها الصفقة <span style="color:var(--red);">*</span></label>
+              <select id="d3_stage">
+                <option value="">اختر المرحلة</option>
+                <option>١ — Lead Generation</option>
+                <option>٢ — Qualification</option>
+                <option>٣ — Discovery</option>
+                <option>٤ — Presentation</option>
+                <option>٥ — Objection Handling</option>
+                <option>٦ — Negotiation</option>
+                <option>٧ — Closing</option>
+                <option>٨ — Follow-up</option>
+              </select>
+            </div>
+            <div class="deal-field">
+              <label>ما المخرج الذي كان ناقصاً؟ <span style="color:var(--red);">*</span></label>
+              <textarea id="d3_missing" placeholder="مثال: لم أتابع بعد إرسال العرض — انتظرت ردهم بدون خطوة تالية..."></textarea>
+            </div>
+            <div class="deal-field">
+              <label>الإجراء التصحيحي لو عدت الآن</label>
+              <textarea id="d3_action" placeholder="مثال: كنت سأحدد موعد متابعة قبل نهاية المكالمة..."></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- النمط العام -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="font-size:13px;font-weight:700;color:var(--navy);">
+          ما المرحلة التي تتوقف فيها معظم صفقاتك؟ <span style="color:var(--red);">*</span>
+        </label>
+        <span style="font-size:11px;color:var(--muted);">هذه الجملة ستُشارَك مع المجموعة في الجزء الثاني</span>
+        <select id="mainStage"
+          style="font-family:'Cairo',sans-serif;font-size:13px;color:var(--navy);background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;outline:none;direction:rtl;width:100%;transition:all 0.2s;">
+          <option value="">اختر المرحلة الأكثر تكراراً عندك</option>
+          <option>١ — Lead Generation — قلة Leads مؤهلة</option>
+          <option>٢ — Qualification — أتابع Leads ضعيفة</option>
+          <option>٣ — Discovery — أرسل عروض بدون فهم كافٍ</option>
+          <option>٤ — Presentation — عرضي لا يقنع</option>
+          <option>٥ — Objection Handling — لا أعرف أرد على الاعتراضات</option>
+          <option>٦ — Negotiation — أخسر في التفاوض</option>
+          <option>٧ — Closing — لا أغلق الصفقة في الوقت المناسب</option>
+          <option>٨ — Follow-up — لا أتابع بانتظام</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- الالتزام الأسبوعي -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٣</div>
+      <div class="sec-title">التزامك <span>هذا الأسبوع</span></div>
+      <div class="sec-timer">⏱ ٥ دقائق (جماعي)</div>
+    </div>
+    <div class="sec-body">
+      <div class="commit-box">
+        <div class="commit-label">🎯 مرحلة واحدة — خطوة واحدة — هذا الأسبوع</div>
+        <div class="commit-hint">ما الشيء الواحد المحدد الذي ستغيره في الأسبوع القادم؟</div>
+        <div class="commit-field">
+          <label>المرحلة التي ستحسّنها هذا الأسبوع <span style="color:var(--red);">*</span></label>
+          <select class="commit-select" id="commitStage">
+            <option value="">اختر مرحلة واحدة</option>
+            <option>١ — Lead Generation</option>
+            <option>٢ — Qualification</option>
+            <option>٣ — Discovery</option>
+            <option>٤ — Presentation</option>
+            <option>٥ — Objection Handling</option>
+            <option>٦ — Negotiation</option>
+            <option>٧ — Closing</option>
+            <option>٨ — Follow-up</option>
+          </select>
+        </div>
+        <div class="commit-field">
+          <label>ما الفعل المحدد الذي ستفعله؟ <span style="color:var(--red);">*</span></label>
+          <input class="commit-input" type="text" id="commitAction"
+            placeholder="مثال: سأكتب بيان احتياج لكل عميل قبل إرسال الـ Proposal هذا الأسبوع"
+            oninput="updateCommitPreview()">
+        </div>
+        <div class="commit-field">
+          <label>كيف ستقيس هذا التحسين؟</label>
+          <input class="commit-input" type="text" id="commitMeasure"
+            placeholder="مثال: سأقيس بعدد الـ Proposals المرسلة مع بيان احتياج مكتوب"
+            oninput="updateCommitPreview()">
+        </div>
+        <!-- Preview -->
+        <div id="commitPreview" style="display:none;background:rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;border:1px solid rgba(200,169,110,0.3);">
+          <div style="font-size:10px;font-weight:800;color:var(--gold);margin-bottom:5px;">👁 التزامك بالكامل</div>
+          <div id="commitPreviewText" style="font-size:13px;color:#fff;line-height:1.7;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-note">📤 المخرج: تشخيص شخصي + خطوة تصحيحية واحدة واضحة</div>
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        إرسال التشخيص والالتزام 📤
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>تم الإرسال!</h2>
+  <p>استلم المدرب تشخيصك الشخصي.<br>سيلخص أكثر ٣ مراحل تكراراً في الفريق ويناقشها الآن.</p>
+  <div class="commit-preview" id="commitPreviewSuccess"></div>
+  <p style="font-weight:700;color:var(--navy);margin-top:12px;">
+    التزامك الأسبوعي تم تسجيله — حافظ عليه! 💪
+  </p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>ZmedCoach © 2026 — <span>ميثاق للتدريب</span></footer>
+
+<script>
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function updateCommitPreview() {
+  const action  = v('commitAction');
+  const measure = v('commitMeasure');
+  const stage   = v('commitStage');
+  const preview = document.getElementById('commitPreview');
+  const text    = document.getElementById('commitPreviewText');
+  if (!action && !stage) { preview.style.display='none'; return; }
+  preview.style.display = 'block';
+  text.innerHTML = `
+    ${stage ? `<b style="color:var(--gold)">المرحلة:</b> ${stage}<br>` : ''}
+    ${action ? `<b style="color:var(--gold)">الفعل:</b> ${action}<br>` : ''}
+    ${measure ? `<b style="color:var(--gold)">القياس:</b> ${measure}` : ''}
+  `;
+}
+
+function collectData() {
+  return {
+    timestamp:    new Date().toLocaleString('ar-EG'),
+    name:         v('name'),
+    jobTitle:     v('jobTitle'),
+    d1_client:    v('d1_client'),
+    d1_stage:     v('d1_stage'),
+    d1_missing:   v('d1_missing'),
+    d1_action:    v('d1_action'),
+    d2_client:    v('d2_client'),
+    d2_stage:     v('d2_stage'),
+    d2_missing:   v('d2_missing'),
+    d2_action:    v('d2_action'),
+    d3_client:    v('d3_client'),
+    d3_stage:     v('d3_stage'),
+    d3_missing:   v('d3_missing'),
+    d3_action:    v('d3_action'),
+    mainStage:    v('mainStage'),
+    commitStage:  v('commitStage'),
+    commitAction: v('commitAction'),
+    commitMeasure:v('commitMeasure'),
+  };
+}
+
+function validate(d) {
+  if (!d.name)         return toast('اكتب اسمك أولاً', true);
+  if (!d.d1_stage)     return toast('اختر مرحلة الصفقة الأولى', true);
+  if (!d.d1_missing)   return toast('اكتب المخرج الناقص في الصفقة الأولى', true);
+  if (!d.d2_stage)     return toast('اختر مرحلة الصفقة الثانية', true);
+  if (!d.d2_missing)   return toast('اكتب المخرج الناقص في الصفقة الثانية', true);
+  if (!d.d3_stage)     return toast('اختر مرحلة الصفقة الثالثة', true);
+  if (!d.d3_missing)   return toast('اكتب المخرج الناقص في الصفقة الثالثة', true);
+  if (!d.mainStage)    return toast('اختر المرحلة الأكثر تكراراً عندك', true);
+  if (!d.commitStage)  return toast('اختر المرحلة التي ستحسّنها', true);
+  if (!d.commitAction) return toast('اكتب الفعل المحدد الذي ستفعله', true);
+  return true;
+}
+
+function formatEmail(d) {
+  return `
+━━━━━━━━━━━━━━━━━━━━
+🔍 تشخيص الصفقات — نشاط الدرس الرابع
+━━━━━━━━━━━━━━━━━━━━
+🕐 ${d.timestamp}
+👤 ${d.name}${d.jobTitle?' — '+d.jobTitle:''}
+
+━━━ الصفقة الأولى ━━━
+العميل: ${d.d1_client||'غير محدد'}
+المرحلة: ${d.d1_stage}
+المخرج الناقص: ${d.d1_missing}
+الإجراء التصحيحي: ${d.d1_action||'لم يكتب'}
+
+━━━ الصفقة الثانية ━━━
+العميل: ${d.d2_client||'غير محدد'}
+المرحلة: ${d.d2_stage}
+المخرج الناقص: ${d.d2_missing}
+الإجراء التصحيحي: ${d.d2_action||'لم يكتب'}
+
+━━━ الصفقة الثالثة ━━━
+العميل: ${d.d3_client||'غير محدد'}
+المرحلة: ${d.d3_stage}
+المخرج الناقص: ${d.d3_missing}
+الإجراء التصحيحي: ${d.d3_action||'لم يكتب'}
+
+━━━ النمط العام ━━━
+معظم صفقاتي تتوقف في: ${d.mainStage}
+
+━━━ الالتزام الأسبوعي ━━━
+المرحلة: ${d.commitStage}
+الفعل المحدد: ${d.commitAction}
+كيف أقيس: ${d.commitMeasure||'لم يحدد'}
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
+}
+
+function downloadExcel(d) {
+  const rows = [
+    ['التاريخ','الاسم','المسمى',
+     'صفقة١ عميل','صفقة١ مرحلة','صفقة١ ناقص','صفقة١ تصحيح',
+     'صفقة٢ عميل','صفقة٢ مرحلة','صفقة٢ ناقص','صفقة٢ تصحيح',
+     'صفقة٣ عميل','صفقة٣ مرحلة','صفقة٣ ناقص','صفقة٣ تصحيح',
+     'المرحلة الأكثر تكراراً',
+     'مرحلة الالتزام','الفعل المحدد','كيف يقيس'],
+    [d.timestamp, d.name, d.jobTitle,
+     d.d1_client, d.d1_stage, d.d1_missing, d.d1_action,
+     d.d2_client, d.d2_stage, d.d2_missing, d.d2_action,
+     d.d3_client, d.d3_stage, d.d3_missing, d.d3_action,
+     d.mainStage,
+     d.commitStage, d.commitAction, d.commitMeasure]
+  ];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = Array(19).fill({wch:22});
+  XLSX.utils.book_append_sheet(wb, ws, 'تشخيص الصفقات');
+  XLSX.writeFile(wb, `DealDiagnosis_${d.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+async function submitForm() {
+  const d = collectData();
+  if (!validate(d)) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:     TRAINER_EMAIL,
+      trainee_name: d.name,
+      main_stage:   d.mainStage,
+      full_summary: formatEmail(d),
+      timestamp:    d.timestamp,
+    });
+    downloadExcel(d);
+    showSuccess(d);
+  } catch(err) {
+    console.error(err);
+    downloadExcel(d);
+    toast('Excel تم حفظه — راجع إعداد EmailJS', true);
+    btn.disabled = false;
+    btn.textContent = 'إرسال التشخيص والالتزام 📤';
+  }
+}
+
+function showSuccess(d) {
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+  document.querySelector('.timer-banner').style.display = 'none';
+  document.querySelector('.stages-ref').style.display = 'none';
+  document.getElementById('commitPreviewSuccess').innerHTML = `
+    <div class="cp-l">💪 التزامك الأسبوعي</div>
+    <div class="cp-t">
+      المرحلة: <span>${d.commitStage}</span><br>
+      الفعل: <span>${d.commitAction}</span>
+      ${d.commitMeasure?`<br>القياس: <span>${d.commitMeasure}</span>`:''}
+    </div>
+  `;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 3500);
+  return false;
+}
+</script>
+</body>
+</html>
