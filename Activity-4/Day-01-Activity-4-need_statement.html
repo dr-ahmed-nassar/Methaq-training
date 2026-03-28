@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نشاط — بيان الاحتياج</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --bg:    #EEF4FB;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Cairo',sans-serif;
+  background:var(--bg); color:var(--navy);
+  direction:rtl; min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+.header { background:var(--navy); position:relative; overflow:hidden; }
+.header::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:48px;
+  background:var(--bg);
+  clip-path:polygon(0 65%, 100% 0, 100% 100%, 0 100%);
+}
+.header-inner {
+  max-width:780px; margin:0 auto;
+  padding:28px 24px 64px;
+  position:relative; z-index:2;
+}
+.logo-row { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.logo-box {
+  width:40px; height:40px; background:#fff;
+  border-radius:8px; display:flex; align-items:center;
+  justify-content:center; font-size:20px; font-weight:900; color:var(--red);
+}
+.logo-text .en { font-size:17px; font-weight:900; color:#fff; }
+.logo-text .en span { color:var(--red); }
+.logo-text .ar { font-size:10px; color:rgba(255,255,255,0.6); }
+.h-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--red); color:#fff;
+  font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:20px; margin-bottom:12px;
+}
+.header h1 { font-size:24px; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.3; }
+.header h1 span { color:var(--gold); }
+.header p { font-size:13px; color:rgba(255,255,255,0.72); line-height:1.7; }
+
+/* ===== TIMER BANNER ===== */
+.timer-banner {
+  max-width:780px; margin:0 auto;
+  padding:0 24px; margin-top:-18px;
+  position:relative; z-index:5;
+}
+.timer-card {
+  background:#fff; border-radius:14px;
+  border:1.5px solid var(--border);
+  box-shadow:0 4px 20px rgba(27,58,92,0.1);
+  display:flex; overflow:hidden;
+}
+.tc-total {
+  background:var(--navy); padding:16px 20px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:2px; flex-shrink:0;
+}
+.tc-total .tt { font-size:10px; color:var(--gold); font-weight:700; }
+.tc-total .tv { font-size:26px; font-weight:900; color:#fff; line-height:1; }
+.tc-total .ts { font-size:10px; color:rgba(255,255,255,0.6); }
+.tc-parts { flex:1; display:flex; }
+.tc-part {
+  flex:1; padding:12px 16px;
+  border-right:1px solid var(--bg);
+  display:flex; flex-direction:column; gap:2px;
+}
+.tc-part:last-child { border-right:none; }
+.tp-badge {
+  display:inline-block; font-size:10px; font-weight:800;
+  color:#fff; padding:2px 8px; border-radius:4px; margin-bottom:3px;
+}
+.tp-title { font-size:13px; font-weight:800; color:var(--navy); }
+.tp-time  { font-size:11px; color:var(--red); font-weight:700; }
+.tp-desc  { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
+
+/* ===== FORM ===== */
+.form-wrap {
+  max-width:780px; margin:20px auto 60px;
+  padding:0 24px;
+  display:flex; flex-direction:column; gap:16px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  background:#fff; border-radius:16px;
+  border:1.5px solid var(--border); overflow:hidden;
+  box-shadow:0 3px 14px rgba(27,58,92,0.05);
+}
+.sec-head {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 20px; border-bottom:2px solid var(--bg);
+}
+.sec-num {
+  width:34px; height:34px; background:var(--navy);
+  color:#fff; border-radius:8px; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.sec-title { font-size:17px; font-weight:800; color:var(--navy); }
+.sec-title span { color:var(--red); }
+.sec-timer {
+  margin-right:auto;
+  background:rgba(230,57,70,0.1); color:var(--red);
+  font-size:12px; font-weight:700;
+  padding:4px 12px; border-radius:20px; white-space:nowrap;
+}
+.sec-body { padding:20px; display:flex; flex-direction:column; gap:14px; }
+
+/* ===== FIELDS ===== */
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:13px; font-weight:700; color:var(--navy); }
+.field label .req { color:var(--red); }
+.field .hint { font-size:11px; color:var(--muted); }
+.field input, .field select, .field textarea {
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:10px; padding:10px 13px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(45,125,210,0.1); background:#fff;
+}
+.field textarea { min-height:80px; resize:vertical; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media(max-width:560px){ .field-grid { grid-template-columns:1fr; } }
+
+/* ===== TEMPLATE REMINDER ===== */
+.template-tip {
+  background:var(--navy); border-radius:12px;
+  padding:14px 18px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.template-tip .tl { font-size:12px; font-weight:800; color:var(--gold); margin-bottom:2px; }
+.template-formula {
+  display:flex; align-items:center; gap:6px;
+  flex-wrap:wrap;
+}
+.tf-t { font-size:13px; color:rgba(255,255,255,0.75); font-weight:600; }
+.tf-k {
+  font-size:13px; font-weight:900; color:var(--gold);
+  background:rgba(200,169,110,0.15);
+  padding:2px 10px; border-radius:5px;
+}
+.tf-arrow { font-size:14px; color:rgba(255,255,255,0.4); }
+
+/* ===== BUILDER ===== */
+.builder {
+  background:var(--bg); border-radius:12px;
+  border:1.5px solid var(--border); padding:16px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.b-row { display:flex; align-items:flex-start; gap:10px; }
+.b-label {
+  width:120px; flex-shrink:0;
+  background:var(--navy); color:#fff;
+  border-radius:8px; padding:8px 10px;
+  font-size:11px; font-weight:800;
+  text-align:center; line-height:1.4;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height:42px;
+}
+.b-label span { color:var(--gold); font-size:10px; display:block; margin-top:1px; }
+.b-arrow { font-size:16px; color:var(--gold); font-weight:900; flex-shrink:0; margin-top:10px; }
+.b-input {
+  flex:1;
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:#fff; border:1.5px solid var(--border);
+  border-radius:8px; padding:10px 12px;
+  outline:none; transition:all 0.2s; direction:rtl;
+}
+.b-input:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(45,125,210,0.1); }
+
+/* ===== PREVIEW ===== */
+.preview-box {
+  background:linear-gradient(135deg, var(--navy), #0f2238);
+  border-radius:12px; padding:16px 20px;
+}
+.preview-label { font-size:11px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+.preview-text {
+  font-size:14px; font-weight:700; color:#fff;
+  line-height:1.9; min-height:52px;
+}
+.preview-text .ph { color:rgba(255,255,255,0.25); font-style:italic; font-weight:400; }
+.preview-text .val { color:var(--gold); }
+
+/* ===== WARNING ===== */
+.warn-box {
+  background:rgba(230,57,70,0.06);
+  border:1.5px solid rgba(230,57,70,0.25);
+  border-radius:10px; padding:12px 16px;
+  display:flex; align-items:flex-start; gap:10px;
+}
+.warn-box .wi { font-size:18px; flex-shrink:0; }
+.warn-box .wt { font-size:13px; font-weight:700; color:var(--red); }
+.warn-box .ws { font-size:12px; color:var(--muted); margin-top:2px; line-height:1.5; }
+
+/* ===== CHECKLIST ===== */
+.checklist {
+  display:flex; flex-direction:column; gap:8px;
+}
+.check-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px;
+  background:var(--bg); border-radius:8px;
+  border:1.5px solid var(--border);
+  cursor:pointer; transition:all 0.2s;
+}
+.check-item:hover { border-color:var(--blue); }
+.check-item.checked { border-color:var(--blue); background:#e8f2fc; }
+.check-item input[type="checkbox"] { width:16px; height:16px; accent-color:var(--blue); cursor:pointer; }
+.check-item .ci-text { font-size:13px; font-weight:600; color:var(--navy); flex:1; }
+.check-item .ci-icon { font-size:16px; }
+
+/* ===== INFO BOX ===== */
+.info-box {
+  background:rgba(45,125,210,0.06);
+  border:1.5px solid rgba(45,125,210,0.2);
+  border-radius:10px; padding:12px 16px;
+  display:flex; align-items:flex-start; gap:10px;
+}
+.info-box .ii { font-size:18px; flex-shrink:0; }
+.info-box .it { font-size:13px; font-weight:700; color:var(--blue); }
+.info-box .is { font-size:12px; color:var(--muted); margin-top:2px; line-height:1.5; }
+
+/* ===== SUBMIT ===== */
+.submit-area {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 20px; background:var(--bg); border-top:2px solid var(--border);
+}
+.submit-note { font-size:12px; color:var(--muted); max-width:380px; line-height:1.5; }
+.btn-submit {
+  font-family:'Cairo',sans-serif; font-size:15px; font-weight:800;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:13px 36px; cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.btn-submit:hover { background:#c92d38; transform:translateY(-1px); }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* ===== SUCCESS ===== */
+.success-screen {
+  display:none; text-align:center;
+  padding:60px 24px; max-width:540px; margin:0 auto;
+}
+.success-screen.show { display:block; }
+.success-icon {
+  width:88px; height:88px;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:38px;
+  margin:0 auto 20px; animation:pop 0.5s ease;
+}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success-screen h2 { font-size:24px; font-weight:900; color:var(--navy); margin-bottom:10px; }
+.success-screen p  { font-size:13px; color:var(--muted); line-height:1.7; }
+.statement-preview {
+  background:var(--navy); border-radius:12px;
+  padding:16px 20px; margin:16px 0; text-align:right;
+}
+.statement-preview .spl { font-size:11px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+.statement-preview .spt { font-size:14px; font-weight:700; color:#fff; line-height:1.8; }
+.statement-preview .spt span { color:var(--gold); }
+
+/* ===== TOAST ===== */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:#fff;
+  padding:12px 24px; border-radius:12px;
+  font-size:13px; font-weight:600; z-index:999;
+  box-shadow:0 6px 24px rgba(0,0,0,0.2);
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+.toast.err { background:var(--red); }
+
+footer {
+  text-align:center; padding:24px;
+  font-size:12px; color:var(--muted);
+  border-top:1px solid var(--border);
+}
+footer span { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo-box">Z</div>
+      <div class="logo-text">
+        <div class="en"><span>Z</span>medCoach</div>
+        <div class="ar">زمدكوتش للتدريب</div>
+      </div>
+    </div>
+    <div class="h-badge">📝 نشاط فردي — الدرس الخامس</div>
+    <h1>اكتب <span>بيان الاحتياج</span> من واقعك</h1>
+    <p>اختر عميلاً حقيقياً أو افتراضياً — واكتب بيان احتياج كامل يصبح أساس الـ Proposal في اليوم الثالث</p>
+  </div>
+</div>
+
+<!-- TIMER BANNER -->
+<div class="timer-banner">
+  <div class="timer-card">
+    <div class="tc-total">
+      <div class="tt">⏱ الوقت الكلي</div>
+      <div class="tv">١٠</div>
+      <div class="ts">دقيقة</div>
+    </div>
+    <div class="tc-parts">
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--navy);">الجزء ١</div>
+        <div class="tp-title">الكتابة</div>
+        <div class="tp-time">⏱ ٦ دقائق</div>
+        <div class="tp-desc">امأل القالب الكامل — وضع + أثر + هدف + مؤشر + توقيت</div>
+      </div>
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--red);">الجزء ٢</div>
+        <div class="tp-title">المراجعة الجماعية</div>
+        <div class="tp-time">⏱ ٤ دقائق</div>
+        <div class="tp-desc">المدرب يراجع ٣ أمثلة — هل البيان محدد؟ فيه قياس؟ توقيت؟</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="formWrap">
+
+  <!-- القسم الأول: بيانات -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">١</div>
+      <div class="sec-title">بيانات <span>المتدرب</span></div>
+    </div>
+    <div class="sec-body">
+      <div class="field-grid">
+        <div class="field">
+          <label>اسمك الكامل <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="اسمك">
+        </div>
+        <div class="field">
+          <label>نوع العميل الذي ستكتب عنه <span class="req">*</span></label>
+          <select id="clientType">
+            <option value="">اختر النوع</option>
+            <option>عميل حقيقي — شركة (B2B)</option>
+            <option>عميل حقيقي — فرد (B2C)</option>
+            <option>عميل افتراضي — شركة (B2B)</option>
+            <option>عميل افتراضي — فرد (B2C)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>وصف مختصر للعميل</label>
+        <input type="text" id="clientDesc"
+          placeholder="مثال: شركة تجزئة متوسطة — ٨٠ موظف — فريق مبيعات من ١٥ شخصاً">
+        <span class="hint">السياق يساعد المدرب في تقييم دقة بيانك</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- القسم الثاني: بيان الاحتياج -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٢</div>
+      <div class="sec-title">بيان <span>الاحتياج</span></div>
+      <div class="sec-timer">⏱ ٦ دقائق</div>
+    </div>
+    <div class="sec-body">
+
+      <!-- القالب -->
+      <div class="template-tip">
+        <div class="tl">📌 القالب الكامل</div>
+        <div class="template-formula">
+          <span class="tf-t">حالياً</span>
+          <span class="tf-k">[الوضع]</span>
+          <span class="tf-arrow">←</span>
+          <span class="tf-t">مما يؤدي إلى</span>
+          <span class="tf-k">[الأثر]</span>
+          <span class="tf-arrow">←</span>
+          <span class="tf-t">نريد</span>
+          <span class="tf-k">[الهدف]</span>
+          <span class="tf-arrow">←</span>
+          <span class="tf-t">ونقيسه بـ</span>
+          <span class="tf-k">[مؤشر]</span>
+          <span class="tf-arrow">←</span>
+          <span class="tf-t">خلال</span>
+          <span class="tf-k">[الإطار الزمني]</span>
+        </div>
+      </div>
+
+      <!-- Builder -->
+      <div class="builder">
+        <div class="b-row">
+          <div class="b-label">حالياً<span>[الوضع]</span></div>
+          <span class="b-arrow">←</span>
+          <input class="b-input" id="b1" type="text"
+            placeholder="مثال: معدل تحويل فريق المبيعات ١٨٪ وانخفض بعد توسع الفريق"
+            oninput="updatePreview()">
+        </div>
+        <div class="b-row">
+          <div class="b-label">مما يؤدي إلى<span>[الأثر]</span></div>
+          <span class="b-arrow">←</span>
+          <input class="b-input" id="b2" type="text"
+            placeholder="مثال: خسارة ٣٠٪ من الفرص المؤهلة شهرياً وتراجع الإيراد"
+            oninput="updatePreview()">
+        </div>
+        <div class="b-row">
+          <div class="b-label">نريد<span>[الهدف]</span></div>
+          <span class="b-arrow">←</span>
+          <input class="b-input" id="b3" type="text"
+            placeholder="مثال: رفع معدل التحويل إلى ٢٨٪ وتأهيل الفريق الجديد"
+            oninput="updatePreview()">
+        </div>
+        <div class="b-row">
+          <div class="b-label">ونقيسه بـ<span>[مؤشر]</span></div>
+          <span class="b-arrow">←</span>
+          <input class="b-input" id="b4" type="text"
+            placeholder="مثال: تقرير CRM الأسبوعي — نسبة Proposal to Close"
+            oninput="updatePreview()">
+        </div>
+        <div class="b-row">
+          <div class="b-label">خلال<span>[الإطار الزمني]</span></div>
+          <span class="b-arrow">←</span>
+          <input class="b-input" id="b5" type="text"
+            placeholder="مثال: ٩٠ يوماً من تاريخ تنفيذ البرنامج"
+            oninput="updatePreview()">
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-box">
+        <div class="preview-label">👁 بيانك الكامل — كما سيُرسَل للمدرب</div>
+        <div class="preview-text" id="preview">
+          <span class="ph">ابدأ الكتابة في الحقول أعلاه وسيظهر بيانك هنا...</span>
+        </div>
+      </div>
+
+      <!-- التحذير -->
+      <div class="warn-box">
+        <div class="wi">⚠️</div>
+        <div>
+          <div class="wt">لو ما قدرتش تكمل البيان — معناه الاكتشاف ناقص</div>
+          <div class="ws">البيان الناقص يكشف أن معلوماتك عن العميل غير كافية — وهذا درس مهم بحد ذاته. اكتب ما تعرفه واترك ما لا تعرفه فارغاً.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- القسم الثالث: التقييم الذاتي -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٣</div>
+      <div class="sec-title">التقييم <span>الذاتي</span></div>
+    </div>
+    <div class="sec-body">
+
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">
+        تحقق من جودة بيانك قبل الإرسال:
+      </div>
+
+      <div class="checklist" id="checklist">
+        <label class="check-item">
+          <input type="checkbox" onchange="toggleCheck(this)">
+          <span class="ci-icon">🎯</span>
+          <span class="ci-text">البيان محدد — لا يحتمل أكثر من تفسير واحد</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="toggleCheck(this)">
+          <span class="ci-icon">📊</span>
+          <span class="ci-text">يحتوي على مؤشر قياس — ولو تقديري</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="toggleCheck(this)">
+          <span class="ci-icon">⏰</span>
+          <span class="ci-text">يحتوي على إطار زمني واضح</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="toggleCheck(this)">
+          <span class="ci-icon">💥</span>
+          <span class="ci-text">يذكر الأثر السلبي الحالي — ليس فقط الهدف المستقبلي</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="toggleCheck(this)">
+          <span class="ci-icon">🤝</span>
+          <span class="ci-text">بنيت على معلومات حقيقية من محادثة مع العميل</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label>ما الجزء الذي كان أصعب في الكتابة؟</label>
+        <select id="hardPart">
+          <option value="">اختر</option>
+          <option>تحديد الوضع الحالي بدقة</option>
+          <option>قياس حجم الأثر</option>
+          <option>صياغة الهدف بشكل محدد</option>
+          <option>إيجاد مؤشر قياس مناسب</option>
+          <option>تحديد إطار زمني واقعي</option>
+          <option>كل الأجزاء كانت صعبة</option>
+        </select>
+        <span class="hint">هذا يساعد المدرب في تحديد ما يحتاج شرحاً إضافياً</span>
+      </div>
+
+      <div class="field">
+        <label>ملاحظة أو سؤال للمدرب</label>
+        <textarea id="notes"
+          placeholder="هل واجهت صعوبة في جزء معين؟ هل المؤشر الذي اخترته مناسب؟ اسأل هنا..."></textarea>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <div class="ii">💡</div>
+        <div>
+          <div class="it">هذا البيان سيصبح أساس الـ Proposal في اليوم الثالث</div>
+          <div class="is">احتفظ به جيداً — كل جزء فيه سيُستخدم في بناء عرضك البيعي لاحقاً</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-note">📤 المخرج: بيان احتياج جاهز لأول صفقة تعمل عليها</div>
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        إرسال بياني للمدرب 📤
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>تم الإرسال!</h2>
+  <p>استلم المدرب بيان احتياجك.<br>سيراجع ٣ أمثلة أمام الكل في المراجعة الجماعية.</p>
+  <div class="statement-preview" id="statementPreview"></div>
+  <p style="font-weight:700;color:var(--navy);margin-top:12px;">
+    احتفظ بهذا البيان — ستستخدمه في بناء الـ Proposal في اليوم الثالث 📋
+  </p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>ZmedCoach © 2026 — <span>ميثاق للتدريب</span></footer>
+
+<script>
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+// ===== PREVIEW =====
+function updatePreview() {
+  const b1=v('b1'), b2=v('b2'), b3=v('b3'), b4=v('b4'), b5=v('b5');
+  if (!b1&&!b2&&!b3&&!b4&&!b5) {
+    document.getElementById('preview').innerHTML =
+      '<span class="ph">ابدأ الكتابة في الحقول أعلاه وسيظهر بيانك هنا...</span>';
+    return;
+  }
+  const f = (val, ph) => val
+    ? `<span class="val">${val}</span>`
+    : `<span class="ph">${ph}</span>`;
+  document.getElementById('preview').innerHTML =
+    `حالياً ${f(b1,'[الوضع]')} مما يؤدي إلى ${f(b2,'[الأثر]')} — نريد ${f(b3,'[الهدف]')} ونقيسه بـ ${f(b4,'[مؤشر]')} خلال ${f(b5,'[الإطار الزمني]')}`;
+}
+
+// ===== CHECKBOX STYLING =====
+function toggleCheck(el) {
+  el.closest('.check-item').classList.toggle('checked', el.checked);
+}
+
+// ===== COLLECT =====
+function collectData() {
+  const checks = [...document.querySelectorAll('.check-item input:checked')].length;
+  const b1=v('b1'), b2=v('b2'), b3=v('b3'), b4=v('b4'), b5=v('b5');
+  return {
+    timestamp:   new Date().toLocaleString('ar-EG'),
+    name:        v('name'),
+    clientType:  v('clientType'),
+    clientDesc:  v('clientDesc'),
+    b1, b2, b3, b4, b5,
+    statement:   `حالياً ${b1} مما يؤدي إلى ${b2} — نريد ${b3} ونقيسه بـ ${b4} خلال ${b5}`,
+    checksCount: checks,
+    hardPart:    v('hardPart'),
+    notes:       v('notes'),
+  };
+}
+
+// ===== VALIDATE =====
+function validate(d) {
+  if (!d.name)       return toast('اكتب اسمك أولاً', true);
+  if (!d.clientType) return toast('اختر نوع العميل', true);
+  if (!d.b1)         return toast('اكتب الوضع الحالي', true);
+  if (!d.b2)         return toast('اكتب الأثر السلبي', true);
+  if (!d.b3)         return toast('اكتب الهدف المطلوب', true);
+  if (!d.b4)         return toast('اكتب مؤشر القياس', true);
+  if (!d.b5)         return toast('اكتب الإطار الزمني', true);
+  return true;
+}
+
+// ===== FORMAT EMAIL =====
+function formatEmail(d) {
+  return `
+━━━━━━━━━━━━━━━━━━━━
+📝 بيان الاحتياج — نشاط الدرس الخامس
+━━━━━━━━━━━━━━━━━━━━
+🕐 ${d.timestamp}
+👤 ${d.name}
+🏢 نوع العميل: ${d.clientType}
+📋 وصف العميل: ${d.clientDesc||'لم يحدد'}
+
+━━━ البيان الكامل ━━━
+"${d.statement}"
+
+━━━ التفاصيل ━━━
+الوضع:          ${d.b1}
+الأثر:           ${d.b2}
+الهدف:          ${d.b3}
+مؤشر القياس:   ${d.b4}
+الإطار الزمني: ${d.b5}
+
+━━━ التقييم الذاتي ━━━
+عدد معايير الجودة ✓: ${d.checksCount}/5
+أصعب جزء: ${d.hardPart||'لم يحدد'}
+ملاحظات: ${d.notes||'لا يوجد'}
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
+}
+
+// ===== EXCEL =====
+function downloadExcel(d) {
+  const rows = [
+    ['التاريخ','الاسم','نوع العميل','وصف العميل',
+     'الوضع الحالي','الأثر','الهدف','مؤشر القياس','الإطار الزمني',
+     'البيان الكامل','معايير الجودة','أصعب جزء','ملاحظات'],
+    [d.timestamp, d.name, d.clientType, d.clientDesc,
+     d.b1, d.b2, d.b3, d.b4, d.b5,
+     d.statement, `${d.checksCount}/5`, d.hardPart, d.notes]
+  ];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = Array(13).fill({wch:26});
+  XLSX.utils.book_append_sheet(wb, ws, 'بيان الاحتياج');
+  XLSX.writeFile(wb, `NeedStatement_${d.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ===== SUBMIT =====
+async function submitForm() {
+  const d = collectData();
+  if (!validate(d)) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:     TRAINER_EMAIL,
+      trainee_name: d.name,
+      statement:    d.statement,
+      full_summary: formatEmail(d),
+      timestamp:    d.timestamp,
+    });
+    downloadExcel(d);
+    showSuccess(d);
+  } catch(err) {
+    console.error(err);
+    downloadExcel(d);
+    toast('Excel تم حفظه — راجع إعداد EmailJS', true);
+    btn.disabled = false;
+    btn.textContent = 'إرسال بياني للمدرب 📤';
+  }
+}
+
+function showSuccess(d) {
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+  document.querySelector('.timer-banner').style.display = 'none';
+  document.getElementById('statementPreview').innerHTML = `
+    <div class="spl">📋 بيانك الكامل</div>
+    <div class="spt">
+      حالياً <span>${d.b1}</span>
+      مما يؤدي إلى <span>${d.b2}</span> —
+      نريد <span>${d.b3}</span>
+      ونقيسه بـ <span>${d.b4}</span>
+      خلال <span>${d.b5}</span>
+    </div>
+  `;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 3500);
+  return false;
+}
+</script>
+</body>
+</html>
