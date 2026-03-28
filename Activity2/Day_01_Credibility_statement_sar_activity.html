@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نشاط — جملة المصداقية + قصة SAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --bg:    #EEF4FB;
+  --white: #FFFFFF;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--navy);
+  direction: rtl;
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: var(--navy);
+  position: relative; overflow: hidden;
+}
+.header::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:48px;
+  background: var(--bg);
+  clip-path: polygon(0 65%, 100% 0, 100% 100%, 0 100%);
+}
+.header-inner {
+  max-width: 760px; margin:0 auto;
+  padding: 28px 24px 64px;
+  position: relative; z-index:2;
+}
+.logo-row { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.logo-box {
+  width:40px; height:40px; background:#fff;
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:20px; font-weight:900; color:var(--red);
+}
+.logo-text .en { font-size:17px; font-weight:900; color:#fff; }
+.logo-text .en span { color:var(--red); }
+.logo-text .ar { font-size:10px; color:rgba(255,255,255,0.6); }
+
+.h-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--red); color:#fff;
+  font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:20px; margin-bottom:12px;
+}
+.header h1 { font-size:26px; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.3; }
+.header h1 span { color:var(--gold); }
+.header p { font-size:13px; color:rgba(255,255,255,0.72); line-height:1.7; }
+
+/* ===== TIMER BANNER ===== */
+.timer-banner {
+  max-width:760px; margin:0 auto;
+  padding: 0 24px; margin-top:-18px;
+  position:relative; z-index:5;
+}
+.timer-card {
+  background: #fff;
+  border-radius:14px;
+  border:1.5px solid var(--border);
+  box-shadow:0 4px 20px rgba(27,58,92,0.1);
+  display:flex; align-items:center; gap:0;
+  overflow:hidden;
+}
+.tc-total {
+  background:var(--navy);
+  padding:14px 20px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:2px; flex-shrink:0;
+}
+.tc-total .tt { font-size:11px; color:var(--gold); font-weight:700; }
+.tc-total .tv { font-size:24px; font-weight:900; color:#fff; line-height:1; }
+.tc-total .ts { font-size:10px; color:rgba(255,255,255,0.6); }
+.tc-parts {
+  flex:1; display:flex; align-items:stretch;
+}
+.tc-part {
+  flex:1; padding:12px 16px;
+  border-right:1px solid var(--bg);
+  display:flex; flex-direction:column; gap:3px;
+}
+.tc-part:last-child { border-right:none; }
+.tp-num {
+  width:22px; height:22px;
+  background:var(--navy); color:#fff;
+  border-radius:6px; font-size:11px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:2px;
+}
+.tp-title { font-size:13px; font-weight:800; color:var(--navy); }
+.tp-time { font-size:11px; color:var(--red); font-weight:700; }
+.tp-desc { font-size:11px; color:var(--muted); line-height:1.4; }
+
+/* ===== FORM ===== */
+.form-wrap {
+  max-width:760px; margin:20px auto 60px;
+  padding:0 24px;
+  display:flex; flex-direction:column; gap:16px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  background:#fff;
+  border-radius:16px;
+  border:1.5px solid var(--border);
+  overflow:hidden;
+  box-shadow:0 3px 14px rgba(27,58,92,0.05);
+}
+.sec-head {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 20px;
+  border-bottom:2px solid var(--bg);
+}
+.sec-num {
+  width:34px; height:34px;
+  background:var(--navy); color:#fff;
+  border-radius:8px; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.sec-title { font-size:17px; font-weight:800; color:var(--navy); }
+.sec-title span { color:var(--red); }
+.sec-timer {
+  margin-right:auto;
+  background:rgba(230,57,70,0.1);
+  color:var(--red); font-size:12px; font-weight:700;
+  padding:4px 12px; border-radius:20px;
+  white-space:nowrap;
+}
+.sec-body { padding:20px; display:flex; flex-direction:column; gap:14px; }
+
+/* ===== FIELDS ===== */
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:13px; font-weight:700; color:var(--navy); }
+.field label .req { color:var(--red); }
+.field .hint { font-size:11px; color:var(--muted); }
+.field input, .field select, .field textarea {
+  font-family:'Cairo', sans-serif;
+  font-size:13px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:10px; padding:10px 13px;
+  outline:none; transition:all 0.2s;
+  direction:rtl; width:100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(45,125,210,0.1);
+  background:#fff;
+}
+.field textarea { min-height:80px; resize:vertical; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media(max-width:560px) { .field-grid { grid-template-columns:1fr; } }
+
+/* ===== FORMULA REMINDER ===== */
+.formula-tip {
+  background:var(--navy);
+  border-radius:10px;
+  padding:12px 16px;
+  display:flex; align-items:center; gap:10px;
+  flex-wrap:wrap;
+}
+.ft-label {
+  background:var(--red); color:#fff;
+  font-size:11px; font-weight:800;
+  padding:3px 10px; border-radius:6px;
+  flex-shrink:0;
+}
+.ft-formula {
+  display:flex; align-items:center; gap:5px; flex-wrap:wrap;
+}
+.ft-t { font-size:12px; color:rgba(255,255,255,0.7); font-weight:600; }
+.ft-k {
+  font-size:12px; font-weight:900; color:var(--gold);
+  background:rgba(200,169,110,0.15);
+  padding:2px 8px; border-radius:4px;
+}
+
+/* ===== BUILDER ===== */
+.builder {
+  background:var(--bg); border-radius:12px;
+  border:1.5px solid var(--border); padding:14px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.builder-row { display:flex; align-items:center; gap:8px; }
+.br-label {
+  width:88px; flex-shrink:0;
+  background:var(--navy); color:#fff;
+  border-radius:7px; padding:6px 8px;
+  font-size:11px; font-weight:800;
+  text-align:center; line-height:1.3;
+}
+.br-label span { color:var(--gold); font-size:10px; display:block; }
+.br-arrow { font-size:14px; color:var(--gold); font-weight:900; flex-shrink:0; }
+.br-input {
+  flex:1; font-family:'Cairo', sans-serif;
+  font-size:13px; color:var(--navy);
+  background:#fff; border:1.5px solid var(--border);
+  border-radius:8px; padding:9px 12px;
+  outline:none; transition:all 0.2s; direction:rtl;
+}
+.br-input:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(45,125,210,0.1); }
+
+/* ===== PREVIEW ===== */
+.preview-box {
+  background:linear-gradient(135deg, var(--navy), #0f2238);
+  border-radius:12px; padding:14px 18px;
+}
+.preview-label { font-size:11px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+.preview-text { font-size:14px; font-weight:700; color:#fff; line-height:1.8; min-height:44px; }
+.preview-text .ph { color:rgba(255,255,255,0.3); font-style:italic; font-weight:400; }
+.preview-text .val { color:var(--gold); }
+
+/* ===== RADIO ===== */
+.radio-row { display:flex; gap:10px; flex-wrap:wrap; }
+.r-opt {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 14px; background:var(--bg);
+  border-radius:8px; border:1.5px solid var(--border);
+  cursor:pointer; transition:all 0.15s; flex:1;
+}
+.r-opt:hover { border-color:var(--blue); background:#e8f2fc; }
+.r-opt.selected { border-color:var(--navy); background:#dceaf7; }
+.r-opt input { accent-color:var(--blue); width:15px; height:15px; }
+.r-opt span { font-size:13px; font-weight:600; color:var(--navy); }
+
+/* ===== SAR ===== */
+.sar-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+@media(max-width:560px) { .sar-grid { grid-template-columns:1fr; } }
+.sar-card {
+  border-radius:10px; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.sar-head {
+  padding:10px 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.sar-letter { font-size:22px; font-weight:900; color:#fff; }
+.sar-name { font-size:13px; font-weight:700; color:#fff; }
+.sar-body { flex:1; background:#fff; border:1.5px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:12px; display:flex; flex-direction:column; gap:5px; }
+.sar-hint { font-size:11px; color:var(--muted); margin-bottom:3px; }
+.sar-input {
+  font-family:'Cairo', sans-serif; font-size:13px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:8px; padding:8px 10px; outline:none;
+  transition:all 0.2s; direction:rtl; width:100%;
+  resize:vertical; min-height:70px;
+}
+.sar-input:focus { border-color:var(--blue); background:#fff; box-shadow:0 0 0 2px rgba(45,125,210,0.1); }
+
+/* ===== SUBMIT ===== */
+.submit-area {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 20px; background:var(--bg);
+  border-top:2px solid var(--border);
+}
+.submit-note { font-size:12px; color:var(--muted); max-width:400px; line-height:1.5; }
+.btn-submit {
+  font-family:'Cairo', sans-serif; font-size:15px; font-weight:800;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:13px 36px; cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center; gap:8px;
+  white-space:nowrap;
+}
+.btn-submit:hover { background:#c92d38; transform:translateY(-1px); }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* ===== SUCCESS ===== */
+.success-screen {
+  display:none; text-align:center;
+  padding:60px 24px; max-width:500px; margin:0 auto;
+}
+.success-screen.show { display:block; }
+.success-icon {
+  width:88px; height:88px;
+  background:linear-gradient(135deg, var(--blue), var(--navy));
+  border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:38px;
+  margin:0 auto 20px; animation:pop 0.5s ease;
+}
+@keyframes pop { 0%{transform:scale(0)} 80%{transform:scale(1.1)} 100%{transform:scale(1)} }
+.success-screen h2 { font-size:24px; font-weight:900; color:var(--navy); margin-bottom:10px; }
+.success-screen p { font-size:13px; color:var(--muted); line-height:1.7; }
+.success-statement {
+  background:var(--navy); border-radius:12px;
+  padding:16px 20px; margin:16px 0;
+  font-size:14px; font-weight:700; color:#fff; line-height:1.8;
+  text-align:right;
+}
+.success-statement span { color:var(--gold); }
+
+/* ===== TOAST ===== */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:#fff;
+  padding:12px 24px; border-radius:12px;
+  font-size:13px; font-weight:600; z-index:999;
+  box-shadow:0 6px 24px rgba(0,0,0,0.2);
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+.toast.err { background:var(--red); }
+
+footer {
+  text-align:center; padding:24px;
+  font-size:12px; color:var(--muted);
+  border-top:1px solid var(--border);
+}
+footer span { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo-box">Z</div>
+      <div class="logo-text">
+        <div class="en"><span>Z</span>medCoach</div>
+        <div class="ar">زمدكوتش للتدريب</div>
+      </div>
+    </div>
+    <div class="h-badge">✍️ نشاط فردي — الدرس الثاني</div>
+    <h1>جملة <span>المصداقية</span> + قصة SAR</h1>
+    <p>اكتب جملة مصداقيتك لبرنامج من برامج ميثاق للتدريب — ثم اكتب قصة نجاح حقيقية في ٦ أسطر</p>
+  </div>
+</div>
+
+<!-- TIMER BANNER -->
+<div class="timer-banner">
+  <div class="timer-card">
+    <div class="tc-total">
+      <div class="tt">⏱ الوقت الكلي</div>
+      <div class="tv">١٥</div>
+      <div class="ts">دقيقة</div>
+    </div>
+    <div class="tc-parts">
+      <div class="tc-part">
+        <div class="tp-num">١</div>
+        <div class="tp-title">جملة المصداقية</div>
+        <div class="tp-time">⏱ ٥ دقائق</div>
+        <div class="tp-desc">استخدم القالب واكتب جملة محددة لعميلك</div>
+      </div>
+      <div class="tc-part">
+        <div class="tp-num">٢</div>
+        <div class="tp-title">قصة SAR</div>
+        <div class="tp-time">⏱ ١٠ دقائق</div>
+        <div class="tp-desc">Situation + Action + Result في ٦ أسطر</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="formWrap">
+
+  <!-- القسم الأول: بيانات المتدرب -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">١</div>
+      <div class="sec-title">بيانات <span>المتدرب</span></div>
+    </div>
+    <div class="sec-body">
+      <div class="field-grid">
+        <div class="field">
+          <label>اسمك الكامل <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="اسمك">
+        </div>
+        <div class="field">
+          <label>المسمى الوظيفي</label>
+          <input type="text" id="jobTitle" placeholder="مثال: مستشار مبيعات تدريب">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- القسم الثاني: جملة المصداقية -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٢</div>
+      <div class="sec-title">جملة <span>المصداقية</span></div>
+      <div class="sec-timer">⏱ ٥ دقائق</div>
+    </div>
+    <div class="sec-body">
+
+      <!-- القالب -->
+      <div class="formula-tip">
+        <div class="ft-label">📌 القالب</div>
+        <div class="ft-formula">
+          <span class="ft-t">نساعد</span><span class="ft-k">[من؟]</span>
+          <span class="ft-t">على تحسين</span><span class="ft-k">[ماذا؟]</span>
+          <span class="ft-t">عبر</span><span class="ft-k">[كيف؟]</span>
+          <span class="ft-t">ونقيس بـ</span><span class="ft-k">[مؤشر]</span>
+        </div>
+      </div>
+
+      <!-- Builder -->
+      <div class="builder">
+        <div class="builder-row">
+          <div class="br-label">نساعد<span>[من؟]</span></div>
+          <span class="br-arrow">←</span>
+          <input class="br-input" id="b1" type="text"
+            placeholder="مثال: فرق مبيعات شركات التدريب"
+            oninput="updatePreview()">
+        </div>
+        <div class="builder-row">
+          <div class="br-label">على تحسين<span>[ماذا؟]</span></div>
+          <span class="br-arrow">←</span>
+          <input class="br-input" id="b2" type="text"
+            placeholder="مثال: معدل تحويل المكالمات لصفقات"
+            oninput="updatePreview()">
+        </div>
+        <div class="builder-row">
+          <div class="br-label">عبر<span>[كيف؟]</span></div>
+          <span class="br-arrow">←</span>
+          <input class="br-input" id="b3" type="text"
+            placeholder="مثال: برنامج تطبيقي ٥ أيام"
+            oninput="updatePreview()">
+        </div>
+        <div class="builder-row">
+          <div class="br-label">ونقيس بـ<span>[مؤشر]</span></div>
+          <span class="br-arrow">←</span>
+          <input class="br-input" id="b4" type="text"
+            placeholder="مثال: نسبة Proposal to Close"
+            oninput="updatePreview()">
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-box">
+        <div class="preview-label">👁 جملتك الكاملة</div>
+        <div class="preview-text" id="preview">
+          <span class="ph">ابدأ الكتابة في الحقول أعلاه...</span>
+        </div>
+      </div>
+
+      <!-- اختبار المنافس -->
+      <div class="field">
+        <label>هل تنطبق جملتك على منافس آخر؟ <span class="req">*</span></label>
+        <span class="hint">اختبر جملتك — لو نعم يعني محتاج تعدّلها لتكون أكثر تميزاً</span>
+        <div class="radio-row" style="margin-top:6px;">
+          <label class="r-opt">
+            <input type="radio" name="competitor" value="نعم — سأعدّلها">
+            <span>نعم — سأعدّلها 😕</span>
+          </label>
+          <label class="r-opt">
+            <input type="radio" name="competitor" value="لا — جملتي فريدة">
+            <span>لا — جملتي فريدة ✅</span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- القسم الثالث: قصة SAR -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٣</div>
+      <div class="sec-title">قصة <span>SAR</span> في ٦ أسطر</div>
+      <div class="sec-timer">⏱ ١٠ دقائق</div>
+    </div>
+    <div class="sec-body">
+
+      <div class="field">
+        <label>اسم البرنامج أو الكورس الذي ستكتب عنه <span class="req">*</span></label>
+        <input type="text" id="programName"
+          placeholder="مثال: برنامج تطوير مهارات البيع والتفاوض الاحترافي">
+      </div>
+
+      <!-- SAR Grid -->
+      <div class="sar-grid">
+
+        <!-- S -->
+        <div class="sar-card">
+          <div class="sar-head" style="background:#1B3A5C;">
+            <div class="sar-letter">S</div>
+            <div>
+              <div class="sar-name">Situation</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.6);">الوضع — سطران</div>
+            </div>
+          </div>
+          <div class="sar-body">
+            <div class="sar-hint">من العميل؟ ما كان الوضع؟ ما المشكلة؟</div>
+            <textarea class="sar-input" id="sar_s"
+              placeholder="مثال: شركة تجزئة ١٠٠ موظف — معدل تحويل مبيعاتها انخفض لـ ١٨٪ بعد توسع الفريق..."></textarea>
+          </div>
+        </div>
+
+        <!-- A -->
+        <div class="sar-card">
+          <div class="sar-head" style="background:#2D7DD2;">
+            <div class="sar-letter">A</div>
+            <div>
+              <div class="sar-name">Action</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.6);">ما فعلناه — سطران</div>
+            </div>
+          </div>
+          <div class="sar-body">
+            <div class="sar-hint">ما البرنامج؟ كيف خصصناه لهم؟</div>
+            <textarea class="sar-input" id="sar_a"
+              placeholder="مثال: صممنا برنامج ٣ أيام على الاكتشاف والإغلاق — بأمثلة من قطاعهم فقط..."></textarea>
+          </div>
+        </div>
+
+        <!-- R -->
+        <div class="sar-card">
+          <div class="sar-head" style="background:#E63946;">
+            <div class="sar-letter">R</div>
+            <div>
+              <div class="sar-name">Result</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.6);">النتيجة — سطران</div>
+            </div>
+          </div>
+          <div class="sar-body">
+            <div class="sar-hint">ما النتيجة؟ في كم وقت؟ بأي مؤشر؟</div>
+            <textarea class="sar-input" id="sar_r"
+              placeholder="مثال: ارتفع معدل التحويل من ١٨٪ إلى ٢٩٪ خلال ٦٠ يوماً من التنفيذ..."></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label>ملاحظة للمدرب — هل واجهت صعوبة في جزء معين؟</label>
+        <textarea id="notes"
+          placeholder="اختياري — اكتب أي تساؤل أو صعوبة في الكتابة..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-note">بعد الإرسال — المدرب سيعلق على أقوى ٣ جمل مع المجموعة</div>
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        إرسال جملتي وقصتي 📤
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>تم الإرسال بنجاح!</h2>
+  <p>استلم المدرب جملتك وقصتك.<br>سيناقش أقوى ٣ جمل مع المجموعة.</p>
+  <div class="success-statement" id="successStatement"></div>
+  <p style="margin-top:12px;">استعد للنقاش — جملتك قد تكون من الأفضل! 🌟</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>ZmedCoach © 2026 — <span>ميثاق للتدريب</span></footer>
+
+<script>
+// ===== CONFIG =====
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ===== PREVIEW =====
+function updatePreview() {
+  const b1 = v('b1'), b2 = v('b2'), b3 = v('b3'), b4 = v('b4');
+  if (!b1 && !b2 && !b3 && !b4) {
+    document.getElementById('preview').innerHTML =
+      '<span class="ph">ابدأ الكتابة في الحقول أعلاه...</span>';
+    return;
+  }
+  const f = (val, placeholder) =>
+    val ? `<span class="val">${val}</span>` : `<span class="ph">${placeholder}</span>`;
+  document.getElementById('preview').innerHTML =
+    `نساعد ${f(b1,'[من؟]')} على تحسين ${f(b2,'[ماذا؟]')} عبر ${f(b3,'[كيف؟]')} ونقيس بـ ${f(b4,'[مؤشر]')}`;
+}
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+// ===== COLLECT =====
+function collectData() {
+  const b1=v('b1'), b2=v('b2'), b3=v('b3'), b4=v('b4');
+  return {
+    timestamp:   new Date().toLocaleString('ar-EG'),
+    name:        v('name'),
+    jobTitle:    v('jobTitle'),
+    programName: v('programName'),
+    b1, b2, b3, b4,
+    statement:   `نساعد ${b1} على تحسين ${b2} عبر ${b3} ونقيس بـ ${b4}`,
+    competitor:  getRadio('competitor'),
+    sar_s:       v('sar_s'),
+    sar_a:       v('sar_a'),
+    sar_r:       v('sar_r'),
+    notes:       v('notes'),
+  };
+}
+
+// ===== VALIDATE =====
+function validate(d) {
+  if (!d.name)        return toast('اكتب اسمك أولاً', true);
+  if (!d.b1||!d.b2||!d.b3||!d.b4)
+                      return toast('أكمل جميع أجزاء جملة المصداقية', true);
+  if (!d.competitor)  return toast('هل تنطبق جملتك على منافس؟', true);
+  if (!d.programName) return toast('اكتب اسم البرنامج في قصة SAR', true);
+  if (!d.sar_s)       return toast('اكتب الـ Situation في قصة SAR', true);
+  if (!d.sar_a)       return toast('اكتب الـ Action في قصة SAR', true);
+  if (!d.sar_r)       return toast('اكتب الـ Result في قصة SAR', true);
+  return true;
+}
+
+// ===== FORMAT EMAIL =====
+function formatEmail(d) {
+  return `
+━━━━━━━━━━━━━━━━━━━━
+✍️ نشاط — جملة المصداقية + SAR
+━━━━━━━━━━━━━━━━━━━━
+🕐 ${d.timestamp}
+👤 ${d.name}${d.jobTitle ? ' — ' + d.jobTitle : ''}
+
+━━━ جملة المصداقية ━━━
+"${d.statement}"
+
+التفاصيل:
+من؟    → ${d.b1}
+ماذا؟  → ${d.b2}
+كيف؟   → ${d.b3}
+مؤشر؟ → ${d.b4}
+تنطبق على منافس؟ ${d.competitor}
+
+━━━ قصة SAR ━━━
+البرنامج: ${d.programName}
+
+S — Situation:
+${d.sar_s}
+
+A — Action:
+${d.sar_a}
+
+R — Result:
+${d.sar_r}
+
+ملاحظات: ${d.notes || 'لا يوجد'}
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
+}
+
+// ===== EXCEL =====
+function downloadExcel(d) {
+  const rows = [
+    ['التاريخ','الاسم','المسمى الوظيفي','من؟','ماذا؟','كيف؟','مؤشر','الجملة الكاملة','تنطبق على منافس؟','البرنامج','Situation','Action','Result','ملاحظات'],
+    [d.timestamp, d.name, d.jobTitle, d.b1, d.b2, d.b3, d.b4, d.statement, d.competitor, d.programName, d.sar_s, d.sar_a, d.sar_r, d.notes]
+  ];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = Array(14).fill({wch:24});
+  XLSX.utils.book_append_sheet(wb, ws, 'المصداقية والـ SAR');
+  XLSX.writeFile(wb, `SAR_${d.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ===== SUBMIT =====
+async function submitForm() {
+  const d = collectData();
+  if (!validate(d)) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:     TRAINER_EMAIL,
+      trainee_name: d.name,
+      statement:    d.statement,
+      full_summary: formatEmail(d),
+      timestamp:    d.timestamp,
+    });
+    downloadExcel(d);
+    showSuccess(d);
+  } catch(err) {
+    console.error(err);
+    downloadExcel(d);
+    toast('Excel تم حفظه — راجع إعداد EmailJS', true);
+    btn.disabled = false;
+    btn.textContent = 'إرسال جملتي وقصتي 📤';
+  }
+}
+
+function showSuccess(d) {
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('successStatement').innerHTML =
+    `"نساعد <span>${d.b1}</span> على تحسين <span>${d.b2}</span> عبر <span>${d.b3}</span> ونقيس بـ <span>${d.b4}</span>"`;
+  document.getElementById('successScreen').classList.add('show');
+  document.querySelector('.timer-banner').style.display = 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 3500);
+  return false;
+}
+
+// radio styling
+document.addEventListener('change', e => {
+  if (e.target.type === 'radio') {
+    document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => {
+      r.closest('.r-opt').classList.toggle('selected', r.checked);
+    });
+  }
+});
+</script>
+</body>
+</html>
