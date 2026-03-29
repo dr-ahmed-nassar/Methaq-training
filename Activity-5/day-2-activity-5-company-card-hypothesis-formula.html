@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نشاط — بطاقة الشركة + الفرضية + ٦ أسئلة | ميثاق</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --bg:    #EEF4FB;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Cairo',sans-serif;
+  background:var(--bg); color:var(--navy);
+  direction:rtl; min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+.header { background:var(--navy); position:relative; overflow:hidden; }
+.header::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:48px;
+  background:var(--bg);
+  clip-path:polygon(0 65%, 100% 0, 100% 100%, 0 100%);
+}
+.header-inner {
+  max-width:780px; margin:0 auto;
+  padding:28px 24px 64px;
+  position:relative; z-index:2;
+}
+.logo-row { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.logo-box {
+  width:40px; height:40px; background:#fff;
+  border-radius:8px; display:flex; align-items:center;
+  justify-content:center; font-size:20px; font-weight:900; color:var(--red);
+}
+.logo-text .en { font-size:17px; font-weight:900; color:#fff; }
+.logo-text .en span { color:var(--red); }
+.logo-text .ar { font-size:10px; color:rgba(255,255,255,0.6); }
+.h-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--red); color:#fff;
+  font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:20px; margin-bottom:12px;
+}
+.header h1 { font-size:24px; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.3; }
+.header h1 span { color:var(--gold); }
+.header p { font-size:13px; color:rgba(255,255,255,0.72); line-height:1.7; }
+
+/* ===== TIMER BANNER ===== */
+.timer-banner {
+  max-width:780px; margin:0 auto;
+  padding:0 24px; margin-top:-18px;
+  position:relative; z-index:5;
+}
+.timer-card {
+  background:#fff; border-radius:14px;
+  border:1.5px solid var(--border);
+  box-shadow:0 4px 20px rgba(27,58,92,0.1);
+  display:flex; overflow:hidden;
+}
+.tc-total {
+  background:var(--navy); padding:16px 20px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:2px; flex-shrink:0;
+}
+.tc-total .tt { font-size:10px; color:var(--gold); font-weight:700; }
+.tc-total .tv { font-size:26px; font-weight:900; color:#fff; line-height:1; }
+.tc-total .ts { font-size:10px; color:rgba(255,255,255,0.6); }
+.tc-parts { flex:1; display:flex; }
+.tc-part {
+  flex:1; padding:12px 16px;
+  border-right:1px solid var(--bg);
+  display:flex; flex-direction:column; gap:2px;
+}
+.tc-part:last-child { border-right:none; }
+.tp-badge {
+  display:inline-block; font-size:10px; font-weight:800;
+  color:#fff; padding:2px 8px; border-radius:4px; margin-bottom:3px;
+}
+.tp-title { font-size:13px; font-weight:800; color:var(--navy); }
+.tp-time  { font-size:11px; color:var(--red); font-weight:700; }
+.tp-desc  { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
+
+/* ===== PROGRAMS REFERENCE ===== */
+.programs-ref {
+  max-width:780px; margin:16px auto 0;
+  padding:0 24px;
+}
+.programs-card {
+  background:#fff; border-radius:14px;
+  border:1.5px solid var(--border); padding:14px 18px;
+}
+.programs-label {
+  font-size:12px; font-weight:800; color:var(--navy);
+  margin-bottom:10px; display:flex; align-items:center; gap:6px;
+}
+.programs-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+}
+@media(max-width:600px){ .programs-grid { grid-template-columns:1fr 1fr; } }
+.prog-pill {
+  display:flex; align-items:center; gap:6px;
+  padding:7px 10px; border-radius:8px;
+  border:1.5px solid var(--border);
+  background:var(--bg);
+}
+.prog-pill .pp-n {
+  width:22px; height:22px; border-radius:6px;
+  background:var(--navy); color:#fff;
+  font-size:10px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.prog-pill .pp-t { font-size:11px; font-weight:700; color:var(--navy); line-height:1.3; }
+
+/* ===== FORM ===== */
+.form-wrap {
+  max-width:780px; margin:16px auto 60px;
+  padding:0 24px;
+  display:flex; flex-direction:column; gap:16px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  background:#fff; border-radius:16px;
+  border:1.5px solid var(--border); overflow:hidden;
+  box-shadow:0 3px 14px rgba(27,58,92,0.05);
+}
+.sec-head {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 20px; border-bottom:2px solid var(--bg);
+}
+.sec-num {
+  width:34px; height:34px; background:var(--navy);
+  color:#fff; border-radius:8px; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.sec-title { font-size:17px; font-weight:800; color:var(--navy); }
+.sec-title span { color:var(--red); }
+.sec-timer {
+  margin-right:auto;
+  background:rgba(230,57,70,0.1); color:var(--red);
+  font-size:12px; font-weight:700;
+  padding:4px 12px; border-radius:20px; white-space:nowrap;
+}
+.sec-body { padding:20px; display:flex; flex-direction:column; gap:14px; }
+
+/* ===== FIELDS ===== */
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:13px; font-weight:700; color:var(--navy); }
+.field label .req { color:var(--red); }
+.field .hint { font-size:11px; color:var(--muted); }
+.field input, .field select, .field textarea {
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:10px; padding:10px 13px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(45,125,210,0.1); background:#fff;
+}
+.field textarea { resize:vertical; }
+.fg2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.fg3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+@media(max-width:580px){ .fg2,.fg3 { grid-template-columns:1fr; } }
+
+/* ===== COMPANY CARD PREVIEW ===== */
+.company-preview {
+  background:var(--navy); border-radius:12px;
+  padding:14px 18px; display:none;
+  flex-direction:column; gap:6px;
+}
+.company-preview.show { display:flex; }
+.cp-label { font-size:10px; font-weight:800; color:var(--gold); margin-bottom:2px; }
+.cp-row { display:flex; align-items:flex-start; gap:8px; }
+.cp-badge {
+  font-size:10px; font-weight:700; color:var(--navy);
+  background:var(--gold); padding:2px 8px; border-radius:4px;
+  white-space:nowrap; flex-shrink:0;
+}
+.cp-val { font-size:12px; font-weight:600; color:#fff; line-height:1.5; }
+
+/* ===== HYPOTHESIS ===== */
+.hypo-box {
+  background:var(--bg); border-radius:12px;
+  border:1.5px solid var(--border); padding:14px 16px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.hypo-formula {
+  background:var(--navy); border-radius:8px;
+  padding:10px 14px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+}
+.hf-t { font-size:13px; color:rgba(255,255,255,0.75); font-weight:600; }
+.hf-k {
+  font-size:13px; font-weight:900; color:var(--gold);
+  background:rgba(200,169,110,0.15); padding:2px 10px; border-radius:5px;
+}
+.hypo-inputs { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:580px){ .hypo-inputs { grid-template-columns:1fr; } }
+.hypo-preview {
+  background:rgba(200,169,110,0.1);
+  border:1.5px solid rgba(200,169,110,0.3);
+  border-radius:8px; padding:10px 14px;
+  font-size:13px; font-weight:700; color:var(--navy);
+  line-height:1.7; display:none;
+}
+.hypo-preview.show { display:block; }
+.hypo-preview span { color:var(--red); }
+
+/* ===== KEY QUESTION ===== */
+.key-q-box {
+  background:rgba(200,169,110,0.08);
+  border:1.5px solid var(--gold);
+  border-radius:10px; padding:14px 16px;
+  display:flex; flex-direction:column; gap:6px;
+}
+.kq-label { font-size:12px; font-weight:800; color:var(--gold); }
+.kq-hint  { font-size:11px; color:var(--muted); }
+.kq-input {
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:#fff; border:1.5px solid rgba(200,169,110,0.4);
+  border-radius:8px; padding:9px 12px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+}
+.kq-input:focus { border-color:var(--gold); box-shadow:0 0 0 2px rgba(200,169,110,0.15); }
+
+/* ===== QUESTIONS ===== */
+.q-list { display:flex; flex-direction:column; gap:10px; }
+.q-item { border-radius:10px; overflow:hidden; }
+.q-head {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 14px;
+}
+.q-num {
+  width:26px; height:26px; border-radius:7px;
+  color:#fff; font-size:12px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.q-type    { font-size:12px; font-weight:800; color:#fff; }
+.q-type-en { font-size:10px; color:rgba(255,255,255,0.65); margin-top:1px; }
+.q-purpose {
+  margin-right:auto; font-size:10px; font-weight:700;
+  background:rgba(255,255,255,0.18); color:#fff;
+  padding:2px 10px; border-radius:20px; white-space:nowrap;
+}
+.q-body {
+  background:#fff; border:1.5px solid var(--border);
+  border-top:none; border-radius:0 0 10px 10px;
+  padding:12px 14px; display:flex; flex-direction:column; gap:6px;
+}
+.q-hint { font-size:11px; color:var(--muted); }
+.q-starter {
+  font-size:11px; font-weight:700; color:var(--blue);
+  background:rgba(45,125,210,0.08); border-radius:5px;
+  padding:4px 8px; display:inline-block;
+}
+.q-input {
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:8px; padding:9px 12px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+  resize:vertical; min-height:64px;
+}
+.q-input:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(45,125,210,0.1); background:#fff;
+}
+
+/* ===== SUBMIT ===== */
+.submit-area {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 20px; background:var(--bg); border-top:2px solid var(--border);
+}
+.submit-note { font-size:12px; color:var(--muted); max-width:380px; line-height:1.5; }
+.btn-submit {
+  font-family:'Cairo',sans-serif; font-size:15px; font-weight:800;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:13px 36px; cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.btn-submit:hover { background:#c92d38; transform:translateY(-1px); }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* ===== SUCCESS ===== */
+.success-screen {
+  display:none; text-align:center;
+  padding:60px 24px; max-width:520px; margin:0 auto;
+}
+.success-screen.show { display:block; }
+.success-icon {
+  width:88px; height:88px;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:38px;
+  margin:0 auto 20px; animation:pop 0.5s ease;
+}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success-screen h2 { font-size:24px; font-weight:900; color:var(--navy); margin-bottom:10px; }
+.success-screen p { font-size:13px; color:var(--muted); line-height:1.7; }
+.result-card {
+  background:var(--navy); border-radius:12px;
+  padding:16px 20px; margin:16px 0; text-align:right;
+  display:flex; flex-direction:column; gap:8px;
+}
+.rc-label { font-size:10px; font-weight:800; color:var(--gold); }
+.rc-text  { font-size:13px; font-weight:700; color:#fff; line-height:1.7; }
+.rc-text span { color:var(--gold); }
+
+/* ===== TOAST ===== */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:#fff;
+  padding:12px 24px; border-radius:12px;
+  font-size:13px; font-weight:600; z-index:999;
+  box-shadow:0 6px 24px rgba(0,0,0,0.2);
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+.toast.err { background:var(--red); }
+
+footer {
+  text-align:center; padding:24px;
+  font-size:12px; color:var(--muted);
+  border-top:1px solid var(--border);
+}
+footer span { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo-box">Z</div>
+      <div class="logo-text">
+        <div class="en"><span>Z</span>medCoach</div>
+        <div class="ar">زمدكوتش للتدريب</div>
+      </div>
+    </div>
+    <div class="h-badge">🏭 نشاط — الدرس السابع | ميثاق للتدريب</div>
+    <h1>بطاقة الشركة + <span>الفرضية</span> + ٦ أسئلة</h1>
+    <p>اختر شركة صناعية أو مصنعاً حقيقياً تريد بيعه برامج ميثاق — وجهّز أسئلتك للمكالمة</p>
+  </div>
+</div>
+
+<!-- TIMER BANNER -->
+<div class="timer-banner">
+  <div class="timer-card">
+    <div class="tc-total">
+      <div class="tt">⏱ الوقت الكلي</div>
+      <div class="tv">١٥</div>
+      <div class="ts">دقيقة</div>
+    </div>
+    <div class="tc-parts">
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--navy);">الجزء ١</div>
+        <div class="tp-title">بطاقة الشركة + الفرضية</div>
+        <div class="tp-time">⏱ ٨ دقائق</div>
+        <div class="tp-desc">الاسم + القطاع الصناعي + الحجم + خبر حديث + فرضيتك</div>
+      </div>
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--red);">الجزء ٢</div>
+        <div class="tp-title">٦ أسئلة جاهزة</div>
+        <div class="tp-time">⏱ ٧ دقائق</div>
+        <div class="tp-desc">٣ وضع + ١ أثر + ١ قرار + ١ توقيت — مخصصة للقطاع الصناعي</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRAMS REFERENCE -->
+<div class="programs-ref">
+  <div class="programs-card">
+    <div class="programs-label">⚙️ برامج ميثاق — المرجع السريع</div>
+    <div class="programs-grid">
+      <div class="prog-pill">
+        <div class="pp-n">١</div>
+        <div class="pp-t">Global Maintenance Management (CMRP)</div>
+      </div>
+      <div class="prog-pill">
+        <div class="pp-n">٢</div>
+        <div class="pp-t">Mechanical Maintenance Essentials</div>
+      </div>
+      <div class="prog-pill">
+        <div class="pp-n">٣</div>
+        <div class="pp-t">Mastering Pneumatic Systems</div>
+      </div>
+      <div class="prog-pill">
+        <div class="pp-n">٤</div>
+        <div class="pp-t">Industrial Hydraulic Diploma</div>
+      </div>
+      <div class="prog-pill">
+        <div class="pp-n">٥</div>
+        <div class="pp-t">CMMS — إدارة الصيانة بالحاسب</div>
+      </div>
+      <div class="prog-pill">
+        <div class="pp-n">٦</div>
+        <div class="pp-t">Lean Six Sigma</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="formWrap">
+
+  <!-- القسم ١: بيانات المتدرب -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">١</div>
+      <div class="sec-title">بيانات <span>المتدرب</span></div>
+    </div>
+    <div class="sec-body">
+      <div class="fg2">
+        <div class="field">
+          <label>اسمك الكامل <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="اسمك">
+        </div>
+        <div class="field">
+          <label>المسمى الوظيفي</label>
+          <input type="text" id="jobTitle" placeholder="مثال: مستشار مبيعات برامج هندسية">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- القسم ٢: بطاقة الشركة -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٢</div>
+      <div class="sec-title">بطاقة <span>الشركة المستهدفة</span></div>
+      <div class="sec-timer">⏱ الجزء الأول — ٨ د</div>
+    </div>
+    <div class="sec-body">
+
+      <div class="fg2">
+        <div class="field">
+          <label>اسم الشركة / المصنع <span class="req">*</span></label>
+          <input type="text" id="companyName"
+            placeholder="مثال: شركة مصر للألومنيوم"
+            oninput="updateCompanyPreview()">
+        </div>
+        <div class="field">
+          <label>القطاع الصناعي <span class="req">*</span></label>
+          <select id="companySector" onchange="updateCompanyPreview()">
+            <option value="">اختر القطاع</option>
+            <option>تصنيع وصناعة ثقيلة</option>
+            <option>صناعة غذائية ومشروبات</option>
+            <option>صناعة دوائية وكيماويات</option>
+            <option>صناعة بترولية وطاقة</option>
+            <option>صناعة نسيج وملابس</option>
+            <option>صناعة إلكترونيات ومعدات</option>
+            <option>إنشاءات وبنية تحتية</option>
+            <option>مياه وصرف صحي</option>
+            <option>حديد وصلب وألومنيوم</option>
+            <option>تعدين واستخراج</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fg3">
+        <div class="field">
+          <label>حجم الشركة <span class="req">*</span></label>
+          <select id="companySize" onchange="updateCompanyPreview()">
+            <option value="">اختر</option>
+            <option>صغيرة — أقل من ١٠٠ موظف</option>
+            <option>متوسطة — ١٠٠-٥٠٠ موظف</option>
+            <option>كبيرة — ٥٠٠-٢٠٠٠ موظف</option>
+            <option>عملاقة — أكثر من ٢٠٠٠ موظف</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>عدد المهندسين / الفنيين (تقديري)</label>
+          <input type="text" id="engineersCount"
+            placeholder="مثال: ٥٠-٨٠ مهندس"
+            oninput="updateCompanyPreview()">
+        </div>
+        <div class="field">
+          <label>مصدر المعلومة</label>
+          <select id="infoSource" onchange="updateCompanyPreview()">
+            <option value="">اختر</option>
+            <option>LinkedIn</option>
+            <option>موقع الشركة</option>
+            <option>معرفة شخصية / زيارة</option>
+            <option>توصية من معارف</option>
+            <option>إعلان وظيفي</option>
+            <option>أخبار / مقالات</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>البرنامج الذي تظن أن الشركة تحتاجه <span class="req">*</span></label>
+        <select id="targetProgram" onchange="updateCompanyPreview()">
+          <option value="">اختر البرنامج</option>
+          <option>Global Maintenance Management - CMRP</option>
+          <option>Mechanical Maintenance Essentials</option>
+          <option>Mastering Pneumatic Systems</option>
+          <option>Industrial Hydraulic Diploma</option>
+          <option>CMMS — Computerized Maintenance Management</option>
+          <option>Lean Six Sigma</option>
+          <option>متعدد — سأحدد بعد الاكتشاف</option>
+        </select>
+        <span class="hint">يمكن تغييره بعد مكالمة الاكتشاف — الآن هو مجرد فرضية</span>
+      </div>
+
+      <div class="field">
+        <label>خبر حديث أو ملاحظة عن الشركة <span class="req">*</span></label>
+        <textarea id="recentNews" rows="2"
+          placeholder="مثال: الشركة أعلنت توسع في خط الإنتاج — أو: وجدت إعلان وظيفي لمهندس صيانة على LinkedIn — أو: أعرف أن معداتهم قديمة وفيها توقفات متكررة..."
+          oninput="updateCompanyPreview()"></textarea>
+        <span class="hint">الخبر أو الملاحظة = مدخل افتتاح المكالمة — كلما كان محدداً كان أقوى</span>
+      </div>
+
+      <!-- Company Card Preview -->
+      <div class="company-preview" id="companyPreview">
+        <div class="cp-label">📋 بطاقة الشركة — معاينة</div>
+        <div class="cp-row">
+          <span class="cp-badge">الشركة</span>
+          <span class="cp-val" id="prev_company">—</span>
+        </div>
+        <div class="cp-row">
+          <span class="cp-badge">القطاع</span>
+          <span class="cp-val" id="prev_sector">—</span>
+        </div>
+        <div class="cp-row">
+          <span class="cp-badge">الحجم</span>
+          <span class="cp-val" id="prev_size">—</span>
+        </div>
+        <div class="cp-row">
+          <span class="cp-badge">البرنامج المستهدف</span>
+          <span class="cp-val" id="prev_prog">—</span>
+        </div>
+        <div class="cp-row">
+          <span class="cp-badge">الملاحظة</span>
+          <span class="cp-val" id="prev_news" style="font-size:12px;">—</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- القسم ٣: الفرضية -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٣</div>
+      <div class="sec-title">الفرضية <span>والسؤال المثبِت</span></div>
+    </div>
+    <div class="sec-body">
+
+      <div class="hypo-box">
+        <div class="hypo-formula">
+          <span class="hf-t">أظن أن</span>
+          <span class="hf-k">[السبب / التحدي الصناعي]</span>
+          <span class="hf-t">يؤثر على</span>
+          <span class="hf-k">[الأداء / الإنتاجية / التكلفة]</span>
+        </div>
+
+        <div class="hypo-inputs">
+          <div class="field">
+            <label>السبب / التحدي <span class="req">*</span></label>
+            <input type="text" id="hypo1"
+              placeholder="مثال: غياب برنامج صيانة وقائية منظم"
+              oninput="updateHypoPreview()">
+          </div>
+          <div class="field">
+            <label>الأثر على الأداء <span class="req">*</span></label>
+            <input type="text" id="hypo2"
+              placeholder="مثال: ارتفاع معدل الأعطال المفاجئة وتوقف الإنتاج"
+              oninput="updateHypoPreview()">
+          </div>
+        </div>
+
+        <div class="hypo-preview" id="hypoPreview">
+          أظن أن <span id="prev_h1">___</span> يؤثر على <span id="prev_h2">___</span>
+        </div>
+      </div>
+
+      <div class="key-q-box">
+        <div class="kq-label">⭐ السؤال الذي يُثبت أو يرفض الفرضية <span style="color:var(--red);">*</span></div>
+        <div class="kq-hint">لو كانت الفرضية صحيحة — ما السؤال الذي سيكشف ذلك في بداية المكالمة؟</div>
+        <input class="kq-input" type="text" id="keyQuestion"
+          placeholder="مثال: ما معدل الأعطال المفاجئة في خط الإنتاج الرئيسي لديكم شهرياً؟">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- القسم ٤: ٦ أسئلة -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٤</div>
+      <div class="sec-title">٦ أسئلة <span>جاهزة للمكالمة</span></div>
+      <div class="sec-timer">⏱ الجزء الثاني — ٧ د</div>
+    </div>
+    <div class="sec-body">
+
+      <div style="background:rgba(27,58,92,0.06);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--navy);font-weight:600;display:flex;align-items:center;gap:8px;">
+        <span>⚙️</span>
+        <span>الأسئلة يجب أن تكون بلغة الصناعة — تحدث عن المعدات والإنتاج والأعطال والتكلفة</span>
+      </div>
+
+      <div class="q-list">
+
+        <!-- سؤال ١ — وضع -->
+        <div class="q-item">
+          <div class="q-head" style="background:#1B3A5C;">
+            <div class="q-num" style="background:var(--gold);color:#1B3A5C;">١</div>
+            <div>
+              <div class="q-type">سؤال الوضع الأول</div>
+              <div class="q-type-en">Situation — ما الذي يحدث الآن؟</div>
+            </div>
+            <div class="q-purpose">وضع فريق الصيانة / الإنتاج</div>
+          </div>
+          <div class="q-body">
+            <div class="q-hint">اسأل عن واقع فريق الصيانة أو الإنتاج</div>
+            <div class="q-starter">مثال: "كيف يسير برنامج الصيانة الوقائية لديكم حالياً؟"</div>
+            <textarea class="q-input" id="q1"
+              placeholder="اكتب سؤالك هنا — مخصص لهذه الشركة..."></textarea>
+          </div>
+        </div>
+
+        <!-- سؤال ٢ — وضع -->
+        <div class="q-item">
+          <div class="q-head" style="background:#1B3A5C;">
+            <div class="q-num" style="background:var(--gold);color:#1B3A5C;">٢</div>
+            <div>
+              <div class="q-type">سؤال الوضع الثاني</div>
+              <div class="q-type-en">Situation — أرقام وتفاصيل</div>
+            </div>
+            <div class="q-purpose">مستوى تأهيل الفريق الهندسي</div>
+          </div>
+          <div class="q-body">
+            <div class="q-hint">اسأل عن مستوى تأهيل المهندسين والفنيين</div>
+            <div class="q-starter">مثال: "ما نسبة المهندسين الذين حصلوا على تدريب تخصصي في الـ ٣ سنوات الأخيرة؟"</div>
+            <textarea class="q-input" id="q2"
+              placeholder="اكتب سؤالك هنا..."></textarea>
+          </div>
+        </div>
+
+        <!-- سؤال ٣ — وضع -->
+        <div class="q-item">
+          <div class="q-head" style="background:#1B3A5C;">
+            <div class="q-num" style="background:var(--gold);color:#1B3A5C;">٣</div>
+            <div>
+              <div class="q-type">سؤال الوضع الثالث</div>
+              <div class="q-type-en">Situation — السبب الجذري</div>
+            </div>
+            <div class="q-purpose">فهم التحديات التشغيلية</div>
+          </div>
+          <div class="q-body">
+            <div class="q-hint">اسأل عن التحديات اليومية في التشغيل والصيانة</div>
+            <div class="q-starter">مثال: "ما أكثر نوع أعطال يتكرر في خطوط إنتاجكم؟"</div>
+            <textarea class="q-input" id="q3"
+              placeholder="اكتب سؤالك هنا..."></textarea>
+          </div>
+        </div>
+
+        <!-- سؤال ٤ — أثر -->
+        <div class="q-item">
+          <div class="q-head" style="background:var(--red);">
+            <div class="q-num" style="background:#fff;color:var(--red);">٤</div>
+            <div>
+              <div class="q-type">سؤال الأثر</div>
+              <div class="q-type-en">Impact — لو استمر الوضع ٦ شهور</div>
+            </div>
+            <div class="q-purpose">تكلفة عدم التدريب</div>
+          </div>
+          <div class="q-body">
+            <div class="q-hint">أجعله يرى تكلفة الأعطال أو الإنتاجية المنخفضة</div>
+            <div class="q-starter">مثال: "لو استمرت معدلات الأعطال الحالية ٦ شهور — ما التأثير على خطة الإنتاج؟"</div>
+            <textarea class="q-input" id="q4"
+              placeholder="اكتب سؤالك هنا..."></textarea>
+          </div>
+        </div>
+
+        <!-- سؤال ٥ — قرار -->
+        <div class="q-item">
+          <div class="q-head" style="background:var(--blue);">
+            <div class="q-num" style="background:#fff;color:var(--blue);">٥</div>
+            <div>
+              <div class="q-type">سؤال القرار</div>
+              <div class="q-type-en">Decision — مين يوقّع؟</div>
+            </div>
+            <div class="q-purpose">صاحب القرار في التدريب</div>
+          </div>
+          <div class="q-body">
+            <div class="q-hint">في الشركات الصناعية: مدير الصيانة + HR + المدير التنفيذي</div>
+            <div class="q-starter">مثال: "مين بيشارك في قرار الموافقة على تدريب فريق الصيانة؟"</div>
+            <textarea class="q-input" id="q5"
+              placeholder="اكتب سؤالك هنا..."></textarea>
+          </div>
+        </div>
+
+        <!-- سؤال ٦ — توقيت -->
+        <div class="q-item">
+          <div class="q-head" style="background:var(--gold);">
+            <div class="q-num" style="background:#fff;color:var(--navy);">٦</div>
+            <div>
+              <div class="q-type" style="color:var(--navy);">سؤال التوقيت</div>
+              <div class="q-type-en" style="color:rgba(27,58,92,0.65);">Timing — الأولوية الآن</div>
+            </div>
+            <div class="q-purpose" style="background:rgba(255,255,255,0.3);color:var(--navy);">أهم أولوية للربع القادم</div>
+          </div>
+          <div class="q-body">
+            <div class="q-hint">الشركات الصناعية لها مواسم إنتاج — التوقيت مهم جداً</div>
+            <div class="q-starter">مثال: "إيه أكثر حاجة بتشغل بالك في موضوع الصيانة والكفاءة التشغيلية دلوقتي؟"</div>
+            <textarea class="q-input" id="q6"
+              placeholder="اكتب سؤالك هنا..."></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="field" style="margin-top:4px;">
+        <label>ملاحظة للمدرب — أي صعوبة أو تساؤل؟</label>
+        <textarea id="notes" rows="2"
+          placeholder="مثال: صعوبة في صياغة سؤال الأثر بطريقة لا تبدو استجوابية..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-note">📤 المخرج: بطاقة شركة صناعية + فرضية + ٦ أسئلة جاهزة للاستخدام الفوري</div>
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        إرسال البطاقة والأسئلة 📤
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>تم الإرسال!</h2>
+  <p>استلم المدرب بطاقتك وأسئلتك الستة.<br>جهّز نفسك — قد تُستخدم أسئلتك مثالاً أمام الكل!</p>
+  <div class="result-card" id="resultCard"></div>
+  <p style="font-weight:700;color:var(--navy);margin-top:12px;">
+    هذه الأسئلة جاهزة للاستخدام الفوري في مكالمتك مع الشركة الصناعية 📞⚙️
+  </p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>ZmedCoach © 2026 — <span>ميثاق للتدريب الهندسي</span></footer>
+
+<script>
+
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+// ===== PREVIEWS =====
+function updateCompanyPreview() {
+  const name = v('companyName');
+  const sec  = v('companySector');
+  if (!name && !sec) return;
+  document.getElementById('companyPreview').classList.add('show');
+  document.getElementById('prev_company').textContent = name                || '—';
+  document.getElementById('prev_sector').textContent  = sec                 || '—';
+  document.getElementById('prev_size').textContent    = v('companySize')    || '—';
+  document.getElementById('prev_prog').textContent    = v('targetProgram')  || '—';
+  document.getElementById('prev_news').textContent    = v('recentNews')     || '—';
+}
+
+function updateHypoPreview() {
+  const h1 = v('hypo1'), h2 = v('hypo2');
+  if (!h1 && !h2) return;
+  document.getElementById('hypoPreview').classList.add('show');
+  document.getElementById('prev_h1').textContent = h1 || '___';
+  document.getElementById('prev_h2').textContent = h2 || '___';
+}
+
+// ===== COLLECT =====
+function collectData() {
+  return {
+    timestamp:      new Date().toLocaleString('ar-EG'),
+    name:           v('name'),
+    jobTitle:       v('jobTitle'),
+    companyName:    v('companyName'),
+    sector:         v('companySector'),
+    size:           v('companySize'),
+    engineers:      v('engineersCount'),
+    infoSource:     v('infoSource'),
+    targetProgram:  v('targetProgram'),
+    recentNews:     v('recentNews'),
+    hypo1:          v('hypo1'),
+    hypo2:          v('hypo2'),
+    hypothesis:     `أظن أن ${v('hypo1')} يؤثر على ${v('hypo2')}`,
+    keyQuestion:    v('keyQuestion'),
+    q1:v('q1'), q2:v('q2'), q3:v('q3'),
+    q4:v('q4'), q5:v('q5'), q6:v('q6'),
+    notes:          v('notes'),
+  };
+}
+
+// ===== VALIDATE =====
+function validate(d) {
+  if (!d.name)          return toast('اكتب اسمك أولاً', true);
+  if (!d.companyName)   return toast('اكتب اسم الشركة / المصنع', true);
+  if (!d.sector)        return toast('اختر القطاع الصناعي', true);
+  if (!d.size)          return toast('اختر حجم الشركة', true);
+  if (!d.targetProgram) return toast('اختر البرنامج المستهدف', true);
+  if (!d.recentNews)    return toast('اكتب خبراً أو ملاحظة عن الشركة', true);
+  if (!d.hypo1 || !d.hypo2) return toast('أكمل الفرضية — السبب والأثر', true);
+  if (!d.keyQuestion)   return toast('اكتب السؤال المثبِت للفرضية', true);
+  if (!d.q1)            return toast('اكتب سؤال الوضع الأول', true);
+  if (!d.q4)            return toast('اكتب سؤال الأثر', true);
+  if (!d.q5)            return toast('اكتب سؤال القرار', true);
+  if (!d.q6)            return toast('اكتب سؤال التوقيت', true);
+  return true;
+}
+
+// ===== FORMAT EMAIL =====
+function formatEmail(d) {
+  return `
+━━━━━━━━━━━━━━━━━━━━
+🏭 بطاقة الشركة الصناعية + ٦ أسئلة | ميثاق
+━━━━━━━━━━━━━━━━━━━━
+🕐 ${d.timestamp}
+👤 ${d.name}${d.jobTitle?' — '+d.jobTitle:''}
+
+━━━ بطاقة الشركة ━━━
+الشركة:          ${d.companyName}
+القطاع:          ${d.sector}
+الحجم:           ${d.size}
+المهندسون:       ${d.engineers||'لم يحدد'}
+المصدر:          ${d.infoSource||'لم يحدد'}
+البرنامج المستهدف: ${d.targetProgram}
+الملاحظة:        ${d.recentNews}
+
+━━━ الفرضية ━━━
+"${d.hypothesis}"
+السؤال المثبِت: ${d.keyQuestion}
+
+━━━ الـ ٦ أسئلة ━━━
+١ (وضع):   ${d.q1||'لم يكتب'}
+٢ (وضع):   ${d.q2||'لم يكتب'}
+٣ (وضع):   ${d.q3||'لم يكتب'}
+٤ (أثر):   ${d.q4||'لم يكتب'}
+٥ (قرار):  ${d.q5||'لم يكتب'}
+٦ (توقيت): ${d.q6||'لم يكتب'}
+
+ملاحظات: ${d.notes||'لا يوجد'}
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
+}
+
+// ===== EXCEL =====
+function downloadExcel(d) {
+  const rows = [
+    ['التاريخ','الاسم','المسمى',
+     'الشركة','القطاع','الحجم','المهندسون','المصدر','البرنامج المستهدف','الملاحظة',
+     'الفرضية','السؤال المثبِت',
+     'س١ وضع','س٢ وضع','س٣ وضع','س٤ أثر','س٥ قرار','س٦ توقيت','ملاحظات'],
+    [d.timestamp, d.name, d.jobTitle,
+     d.companyName, d.sector, d.size, d.engineers, d.infoSource, d.targetProgram, d.recentNews,
+     d.hypothesis, d.keyQuestion,
+     d.q1, d.q2, d.q3, d.q4, d.q5, d.q6, d.notes]
+  ];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = Array(19).fill({wch:26});
+  XLSX.utils.book_append_sheet(wb, ws, 'بطاقة الشركة والأسئلة');
+  XLSX.writeFile(wb, `Methaq_CompanyCard_${d.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ===== SUBMIT =====
+async function submitForm() {
+  const d = collectData();
+  if (!validate(d)) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:       TRAINER_EMAIL,
+      trainee_name:   d.name,
+      company_name:   d.companyName,
+      target_program: d.targetProgram,
+      hypothesis:     d.hypothesis,
+      full_summary:   formatEmail(d),
+      timestamp:      d.timestamp,
+    });
+    downloadExcel(d);
+    showSuccess(d);
+  } catch(err) {
+    console.error(err);
+    downloadExcel(d);
+    toast('Excel تم حفظه — راجع إعداد EmailJS', true);
+    btn.disabled = false;
+    btn.textContent = 'إرسال البطاقة والأسئلة 📤';
+  }
+}
+
+function showSuccess(d) {
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
+  document.querySelector('.timer-banner').style.display = 'none';
+  document.querySelector('.programs-ref').style.display = 'none';
+  document.getElementById('resultCard').innerHTML = `
+    <div class="rc-label">🏭 ${d.companyName} — ${d.sector}</div>
+    <div class="rc-text">البرنامج المستهدف: <span>${d.targetProgram}</span></div>
+    <div class="rc-label" style="margin-top:8px;">🔍 الفرضية</div>
+    <div class="rc-text">${d.hypothesis}</div>
+    <div class="rc-label" style="margin-top:8px;">⭐ السؤال المثبِت</div>
+    <div class="rc-text">"${d.keyQuestion}"</div>
+  `;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 3500);
+  return false;
+}
+</script>
+</body>
+</html>
