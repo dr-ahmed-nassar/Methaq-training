@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نشاط — Role Play اكتشاف | ميثاق للتدريب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --green: #0F7B5A;
+  --bg:    #EEF4FB;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Cairo',sans-serif;
+  background:var(--bg); color:var(--navy);
+  direction:rtl; min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+.header { background:var(--navy); position:relative; overflow:hidden; }
+.header::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:48px;
+  background:var(--bg);
+  clip-path:polygon(0 65%, 100% 0, 100% 100%, 0 100%);
+}
+.header-inner {
+  max-width:820px; margin:0 auto;
+  padding:26px 24px 62px;
+  position:relative; z-index:2;
+}
+.logo-row { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+.logo-box {
+  width:38px; height:38px; background:#fff;
+  border-radius:8px; display:flex; align-items:center;
+  justify-content:center; font-size:19px; font-weight:900; color:var(--red);
+}
+.logo-text .en { font-size:16px; font-weight:900; color:#fff; }
+.logo-text .en span { color:var(--red); }
+.logo-text .ar { font-size:10px; color:rgba(255,255,255,0.6); }
+.h-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--red); color:#fff;
+  font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:20px; margin-bottom:10px;
+}
+.header h1 { font-size:22px; font-weight:900; color:#fff; margin-bottom:5px; line-height:1.3; }
+.header h1 span { color:var(--gold); }
+.header p { font-size:13px; color:rgba(255,255,255,0.7); line-height:1.6; }
+
+/* ===== TIMER BANNER ===== */
+.timer-banner {
+  max-width:820px; margin:0 auto;
+  padding:0 24px; margin-top:-18px;
+  position:relative; z-index:5;
+}
+.timer-card {
+  background:#fff; border-radius:14px;
+  border:1.5px solid var(--border);
+  box-shadow:0 4px 20px rgba(27,58,92,0.1);
+  display:flex; overflow:hidden;
+}
+.tc-total {
+  background:var(--navy); padding:14px 18px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:2px; flex-shrink:0;
+}
+.tc-total .tt { font-size:10px; color:var(--gold); font-weight:700; }
+.tc-total .tv { font-size:24px; font-weight:900; color:#fff; line-height:1; }
+.tc-total .ts { font-size:10px; color:rgba(255,255,255,0.6); }
+.tc-parts { flex:1; display:flex; }
+.tc-part {
+  flex:1; padding:10px 14px;
+  border-right:1px solid var(--bg);
+  display:flex; flex-direction:column; gap:2px;
+}
+.tc-part:last-child { border-right:none; }
+.tp-badge {
+  display:inline-block; font-size:10px; font-weight:800;
+  color:#fff; padding:2px 8px; border-radius:4px; margin-bottom:3px;
+}
+.tp-title { font-size:13px; font-weight:800; color:var(--navy); }
+.tp-time  { font-size:11px; color:var(--red); font-weight:700; }
+.tp-desc  { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
+
+/* ===== MAIN WRAP ===== */
+.main-wrap {
+  max-width:820px; margin:20px auto 60px;
+  padding:0 24px;
+  display:flex; flex-direction:column; gap:14px;
+}
+
+/* ===== SCENARIO CARD ===== */
+.scenario-section {
+  background:var(--navy); border-radius:16px;
+  padding:18px 20px; display:flex; flex-direction:column; gap:10px;
+}
+.sc-title { font-size:14px; font-weight:800; color:var(--gold); margin-bottom:2px; }
+.sc-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+}
+@media(max-width:560px){ .sc-grid { grid-template-columns:1fr; } }
+.sc-info-card {
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px; padding:10px 13px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.sci-label { font-size:10px; font-weight:800; color:var(--gold); margin-bottom:2px; }
+.sci-row {
+  display:flex; align-items:flex-start; gap:6px;
+  font-size:12px; font-weight:600; color:rgba(255,255,255,0.85);
+  line-height:1.5;
+}
+.sci-row::before { content:'⚙️'; font-size:10px; flex-shrink:0; margin-top:1px; }
+.sc-quote {
+  background:rgba(230,57,70,0.15);
+  border-right:3px solid var(--red);
+  border-radius:0 8px 8px 0;
+  padding:10px 14px;
+  font-size:13px; font-weight:700; color:#fff;
+  font-style:italic; line-height:1.6;
+  grid-column:1/-1;
+}
+.sc-quote strong { color:var(--gold); font-style:normal; }
+
+/* ===== ROLES GRID ===== */
+.roles-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+}
+@media(max-width:600px){ .roles-grid { grid-template-columns:1fr; } }
+.role-card {
+  border-radius:12px; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 2px 10px rgba(27,58,92,0.08);
+}
+.rc-head {
+  padding:12px 14px;
+  display:flex; align-items:center; gap:9px;
+}
+.rc-icon { font-size:20px; }
+.rc-title { font-size:14px; font-weight:900; color:#fff; }
+.rc-sub   { font-size:10px; color:rgba(255,255,255,0.65); margin-top:1px; }
+.rc-body {
+  flex:1; background:#fff;
+  border:1.5px solid var(--border); border-top:none;
+  border-radius:0 0 12px 12px;
+  padding:12px 14px;
+  display:flex; flex-direction:column; gap:7px;
+}
+.rc-point {
+  display:flex; align-items:flex-start; gap:8px;
+  font-size:12px; font-weight:600; color:var(--navy);
+  line-height:1.4;
+}
+.rc-dot {
+  width:7px; height:7px; border-radius:50%;
+  flex-shrink:0; margin-top:4px;
+}
+.rc-warn {
+  font-size:11px; font-weight:700;
+  padding:5px 9px; border-radius:6px;
+  margin-top:4px;
+}
+.role-seller .rc-head { background:var(--navy); }
+.role-seller .rc-dot  { background:var(--navy); }
+.role-seller .rc-warn { background:rgba(27,58,92,0.08); color:var(--navy); }
+
+.role-client .rc-head { background:var(--red); }
+.role-client .rc-dot  { background:var(--red); }
+.role-client .rc-warn { background:rgba(230,57,70,0.08); color:var(--red); }
+
+.role-observer .rc-head { background:var(--green); }
+.role-observer .rc-dot  { background:var(--green); }
+.role-observer .rc-warn { background:rgba(15,123,90,0.08); color:var(--green); }
+
+/* ===== FORM SECTION ===== */
+.section {
+  background:#fff; border-radius:16px;
+  border:1.5px solid var(--border); overflow:hidden;
+  box-shadow:0 3px 14px rgba(27,58,92,0.05);
+}
+.sec-head {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 20px; border-bottom:2px solid var(--bg);
+}
+.sec-num {
+  width:32px; height:32px; background:var(--navy);
+  color:#fff; border-radius:8px; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.sec-title { font-size:16px; font-weight:800; color:var(--navy); }
+.sec-title span { color:var(--red); }
+.sec-body { padding:18px 20px; display:flex; flex-direction:column; gap:12px; }
+
+/* ===== FIELDS ===== */
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:13px; font-weight:700; color:var(--navy); }
+.field label .req { color:var(--red); }
+.field .hint { font-size:11px; color:var(--muted); }
+.field input, .field select, .field textarea {
+  font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:10px; padding:10px 13px;
+  outline:none; transition:all 0.2s; direction:rtl; width:100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(45,125,210,0.1); background:#fff;
+}
+.field textarea { resize:vertical; }
+.fg2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:520px){ .fg2 { grid-template-columns:1fr; } }
+
+/* ===== NEED STATEMENT BUILDER ===== */
+.ns-builder {
+  background:var(--bg); border-radius:12px;
+  border:1.5px solid var(--border); padding:14px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.ns-formula {
+  background:var(--navy); border-radius:8px;
+  padding:10px 14px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;
+}
+.nf-t { font-size:12px; color:rgba(255,255,255,0.75); font-weight:600; }
+.nf-k {
+  font-size:12px; font-weight:900; color:var(--gold);
+  background:rgba(200,169,110,0.15); padding:2px 8px; border-radius:4px;
+}
+.ns-row { display:flex; align-items:center; gap:8px; }
+.ns-label {
+  width:100px; flex-shrink:0;
+  background:var(--navy); color:#fff;
+  border-radius:7px; padding:6px 8px;
+  font-size:11px; font-weight:800;
+  text-align:center; line-height:1.3;
+}
+.ns-label span { color:var(--gold); font-size:10px; display:block; margin-top:1px; }
+.ns-arrow { font-size:14px; color:var(--gold); font-weight:900; flex-shrink:0; }
+.ns-input {
+  flex:1; font-family:'Cairo',sans-serif; font-size:13px; color:var(--navy);
+  background:#fff; border:1.5px solid var(--border);
+  border-radius:8px; padding:9px 11px;
+  outline:none; transition:all 0.2s; direction:rtl;
+}
+.ns-input:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(45,125,210,0.1); }
+
+/* Preview */
+.ns-preview {
+  background:linear-gradient(135deg,var(--navy),#0f2238);
+  border-radius:10px; padding:13px 16px;
+}
+.np-label { font-size:10px; font-weight:800; color:var(--gold); margin-bottom:6px; }
+.np-text { font-size:13px; font-weight:700; color:#fff; line-height:1.8; min-height:40px; }
+.np-text .ph { color:rgba(255,255,255,0.25); font-style:italic; font-weight:400; }
+.np-text .val { color:var(--gold); }
+
+/* ===== SELF EVAL ===== */
+.eval-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+}
+@media(max-width:520px){ .eval-grid { grid-template-columns:1fr; } }
+.eval-item {
+  border-radius:9px; border:1.5px solid var(--border);
+  padding:10px 12px;
+}
+.ei-q { font-size:12px; font-weight:700; color:var(--navy); margin-bottom:7px; line-height:1.4; }
+.ei-opts { display:flex; flex-direction:column; gap:5px; }
+.ei-opt {
+  display:flex; align-items:center; gap:7px;
+  padding:6px 9px; background:var(--bg);
+  border-radius:7px; border:1.5px solid transparent;
+  cursor:pointer; transition:all 0.15s;
+}
+.ei-opt:hover { border-color:var(--blue); background:#e8f2fc; }
+.ei-opt.sel { border-color:var(--navy); background:#dceaf7; }
+.ei-opt input { accent-color:var(--blue); width:14px; height:14px; }
+.ei-opt span { font-size:12px; font-weight:600; color:var(--navy); }
+
+/* ===== SUBMIT ===== */
+.submit-area {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 20px; background:var(--bg); border-top:2px solid var(--border);
+}
+.submit-note { font-size:12px; color:var(--muted); max-width:360px; line-height:1.5; }
+.btn-submit {
+  font-family:'Cairo',sans-serif; font-size:14px; font-weight:800;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:12px 32px; cursor:pointer;
+  transition:all 0.2s; white-space:nowrap;
+}
+.btn-submit:hover { background:#c92d38; transform:translateY(-1px); }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* ===== SUCCESS ===== */
+.success-screen {
+  display:none; text-align:center;
+  padding:56px 24px; max-width:500px; margin:0 auto;
+}
+.success-screen.show { display:block; }
+.success-icon {
+  width:86px; height:86px;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:36px;
+  margin:0 auto 18px; animation:pop 0.5s ease;
+}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success-screen h2 { font-size:22px; font-weight:900; color:var(--navy); margin-bottom:8px; }
+.success-screen p { font-size:13px; color:var(--muted); line-height:1.7; }
+.statement-box {
+  background:var(--navy); border-radius:12px;
+  padding:14px 18px; margin:14px 0; text-align:right;
+  display:flex; flex-direction:column; gap:6px;
+}
+.sb-l { font-size:10px; font-weight:800; color:var(--gold); }
+.sb-t { font-size:13px; font-weight:700; color:#fff; line-height:1.8; }
+.sb-t span { color:var(--gold); }
+
+/* ===== TOAST ===== */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:#fff;
+  padding:11px 22px; border-radius:12px;
+  font-size:13px; font-weight:600; z-index:999;
+  box-shadow:0 6px 24px rgba(0,0,0,0.2);
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+.toast.err { background:var(--red); }
+
+footer {
+  text-align:center; padding:22px;
+  font-size:12px; color:var(--muted);
+  border-top:1px solid var(--border);
+}
+footer span { color:var(--red); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-row">
+      <div class="logo-box">Z</div>
+      <div class="logo-text">
+        <div class="en"><span>Z</span>medCoach</div>
+        <div class="ar">زمدكوتش للتدريب</div>
+      </div>
+    </div>
+    <div class="h-badge">🎭 نشاط Role Play — الدرس التاسع</div>
+    <h1>اكتشاف <span>٦ دقائق</span> — سيناريو ميثاق الهندسي</h1>
+    <p>طبّق تسلسل وضع ← أثر ← هدف ← قياس — وأرسل بيان الاحتياج بعد الـ Breakout</p>
+  </div>
+</div>
+
+<!-- TIMER BANNER -->
+<div class="timer-banner">
+  <div class="timer-card">
+    <div class="tc-total">
+      <div class="tt">⏱ الوقت الكلي</div>
+      <div class="tv">١٥</div>
+      <div class="ts">دقيقة</div>
+    </div>
+    <div class="tc-parts">
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--navy);">Role Play</div>
+        <div class="tp-title">المكالمة التطبيقية</div>
+        <div class="tp-time">⏱ ٦ دقائق</div>
+        <div class="tp-desc">البائع يطبق التسلسل الكامل مع العميل الصناعي</div>
+      </div>
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--red);">Debrief</div>
+        <div class="tp-title">المراجعة الجماعية</div>
+        <div class="tp-time">⏱ ٥ دقائق</div>
+        <div class="tp-desc">المراقب يعطي تغذية راجعة + بيان الاحتياج يُكتب</div>
+      </div>
+      <div class="tc-part">
+        <div class="tp-badge" style="background:var(--green);">Submit</div>
+        <div class="tp-title">الإرسال</div>
+        <div class="tp-time">⏱ ٤ دقائق</div>
+        <div class="tp-desc">يُسجَّل بيان الاحتياج ويُرسَل للمدرب من هذه الصفحة</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN WRAP -->
+<div class="main-wrap" id="mainWrap">
+
+  <!-- السيناريو -->
+  <div class="scenario-section">
+    <div class="sc-title">📋 السيناريو — العميل الصناعي</div>
+    <div class="sc-grid">
+      <div class="sc-info-card">
+        <div class="sci-label">🏭 بيانات الشركة</div>
+        <div class="sci-row">مصنع بتروكيماويات — ٣٠٠ عامل — ٤٥ مهندس</div>
+        <div class="sci-row">أضافوا خط إنتاج جديد الربع الماضي</div>
+        <div class="sci-row">نظام CMMS قديم — بيانات الصيانة يدوية</div>
+      </div>
+      <div class="sc-info-card">
+        <div class="sci-label">👔 بيانات العميل</div>
+        <div class="sci-row">مدير الصيانة — خبرة ١٢ سنة</div>
+        <div class="sci-row">مسؤول عن فريق من ١٥ فني صيانة</div>
+        <div class="sci-row">يرفع تقارير مباشرة للمدير التنفيذي</div>
+      </div>
+      <div class="sc-quote" style="grid-column:1/-1;">
+        ما ذكره في مكالمة سابقة: <strong>"بنعاني من توقفات متكررة خصوصاً بعد تشغيل الخط الجديد... الموضوع بيكلفنا كتير"</strong>
+        — لم يوضح الحجم أو السبب الجذري أو الأثر المالي بعد
+      </div>
+    </div>
+  </div>
+
+  <!-- الأدوار -->
+  <div class="roles-grid">
+
+    <!-- البائع -->
+    <div class="role-card role-seller">
+      <div class="rc-head">
+        <div class="rc-icon">🎤</div>
+        <div>
+          <div class="rc-title">البائع</div>
+          <div class="rc-sub">Sales Rep — ميثاق</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          طبّق تسلسل وضع ← أثر ← هدف ← قياس
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          لا تتجاوز ٣ أسئلة في المكالمة
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          التلخيص التأكيدي في ٣٠ ثانية
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          اطلب خطوة تالية واضحة في النهاية
+        </div>
+        <div class="rc-warn">⏱ الوقت: ٦ دقائق كاملة</div>
+      </div>
+    </div>
+
+    <!-- العميل -->
+    <div class="role-card role-client">
+      <div class="rc-head">
+        <div class="rc-icon">👔</div>
+        <div>
+          <div class="rc-title">العميل</div>
+          <div class="rc-sub">مدير الصيانة</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          أجب صادقاً على أساس السيناريو
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          لا تسهّل كثيراً ولا تعقّد
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          لو قفز للحل — قل "لكن ليه بالظبط؟"
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          وضّح احتياجاً واحداً فقط
+        </div>
+        <div class="rc-warn" style="background:rgba(230,57,70,0.08);color:var(--red);">⚠️ لا تذكر CMMS أو Lean أولاً</div>
+      </div>
+    </div>
+
+    <!-- المراقب -->
+    <div class="role-card role-observer">
+      <div class="rc-head">
+        <div class="rc-icon">👁</div>
+        <div>
+          <div class="rc-title">المراقب</div>
+          <div class="rc-sub">Observer</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          هل طبّق التسلسل الصحيح؟
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          هل التلخيص التأكيدي كان دقيقاً؟
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          هل طلب خطوة تالية؟
+        </div>
+        <div class="rc-point">
+          <div class="rc-dot"></div>
+          أين كانت أكبر فرصة تحسين؟
+        </div>
+        <div class="rc-warn" style="background:rgba(15,123,90,0.08);color:var(--green);">دوّن ملاحظة واحدة للمشاركة</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- القسم ١: بيانات -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">١</div>
+      <div class="sec-title">بيانات <span>المتدرب</span></div>
+    </div>
+    <div class="sec-body">
+      <div class="fg2">
+        <div class="field">
+          <label>اسمك الكامل <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="اسمك">
+        </div>
+        <div class="field">
+          <label>دورك في الـ Role Play <span class="req">*</span></label>
+          <select id="myRole">
+            <option value="">اختر دورك</option>
+            <option>🎤 البائع</option>
+            <option>👔 العميل</option>
+            <option>👁 المراقب</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- القسم ٢: بيان الاحتياج -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٢</div>
+      <div class="sec-title">بيان <span>الاحتياج</span> — المخرج النهائي</div>
+    </div>
+    <div class="sec-body">
+
+      <div style="background:rgba(27,58,92,0.06);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--navy);font-weight:600;display:flex;align-items:center;gap:8px;">
+        <span>⚙️</span>
+        <span>بناءً على المكالمة — سجّل بيان الاحتياج الكامل لمصنع البتروكيماويات</span>
+      </div>
+
+      <div class="ns-builder">
+        <div class="ns-formula">
+          <span class="nf-t">حالياً</span><span class="nf-k">[الوضع]</span>
+          <span class="nf-t">مما يؤدي إلى</span><span class="nf-k">[الأثر]</span>
+          <span class="nf-t">نريد</span><span class="nf-k">[الهدف]</span>
+          <span class="nf-t">ونقيسه بـ</span><span class="nf-k">[قياس]</span>
+        </div>
+
+        <div class="ns-row">
+          <div class="ns-label">حالياً<span>[الوضع]</span></div>
+          <span class="ns-arrow">←</span>
+          <input class="ns-input" id="ns1" type="text"
+            placeholder="مثال: توقفات متكررة في الخط الجديد — معدل ٣ أعطال أسبوعياً"
+            oninput="updatePreview()">
+        </div>
+        <div class="ns-row">
+          <div class="ns-label">مما يؤدي إلى<span>[الأثر]</span></div>
+          <span class="ns-arrow">←</span>
+          <input class="ns-input" id="ns2" type="text"
+            placeholder="مثال: خسارة ١٠-١٥٪ من طاقة الإنتاج وتكاليف طوارئ مرتفعة"
+            oninput="updatePreview()">
+        </div>
+        <div class="ns-row">
+          <div class="ns-label">نريد<span>[الهدف]</span></div>
+          <span class="ns-arrow">←</span>
+          <input class="ns-input" id="ns3" type="text"
+            placeholder="مثال: تأهيل فريق الصيانة على CMMS وخفض معدل الأعطال ٥٠٪"
+            oninput="updatePreview()">
+        </div>
+        <div class="ns-row">
+          <div class="ns-label">ونقيسه بـ<span>[قياس]</span></div>
+          <span class="ns-arrow">←</span>
+          <input class="ns-input" id="ns4" type="text"
+            placeholder="مثال: تقرير CMMS الأسبوعي ومعدل MTTR خلال ٩٠ يوماً"
+            oninput="updatePreview()">
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="ns-preview">
+        <div class="np-label">👁 البيان الكامل</div>
+        <div class="np-text" id="preview">
+          <span class="ph">ابدأ الكتابة وسيظهر البيان هنا...</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- القسم ٣: التغذية الراجعة -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-num">٣</div>
+      <div class="sec-title">التغذية <span>الراجعة</span></div>
+    </div>
+    <div class="sec-body">
+
+      <div class="eval-grid">
+        <div class="eval-item">
+          <div class="ei-q">هل طُبِّق تسلسل وضع ← أثر ← هدف؟</div>
+          <div class="ei-opts">
+            <label class="ei-opt"><input type="radio" name="q1" value="نعم كامل"><span>نعم — كامل ✅</span></label>
+            <label class="ei-opt"><input type="radio" name="q1" value="جزئياً"><span>جزئياً ⚠️</span></label>
+            <label class="ei-opt"><input type="radio" name="q1" value="لا لم يطبق"><span>لا — لم يطبق ❌</span></label>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="ei-q">هل التلخيص التأكيدي كان دقيقاً؟</div>
+          <div class="ei-opts">
+            <label class="ei-opt"><input type="radio" name="q2" value="دقيق جداً"><span>دقيق جداً ✅</span></label>
+            <label class="ei-opt"><input type="radio" name="q2" value="تقريباً"><span>تقريباً ⚠️</span></label>
+            <label class="ei-opt"><input type="radio" name="q2" value="لم يتلخص"><span>لم يتلخص ❌</span></label>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="ei-q">هل طُلبت خطوة تالية واضحة؟</div>
+          <div class="ei-opts">
+            <label class="ei-opt"><input type="radio" name="q3" value="نعم واضحة"><span>نعم — واضحة ✅</span></label>
+            <label class="ei-opt"><input type="radio" name="q3" value="مبهمة"><span>مبهمة ⚠️</span></label>
+            <label class="ei-opt"><input type="radio" name="q3" value="لم تطلب"><span>لم تطلب ❌</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>أكبر نقطة تحسين لاحظتها في الـ Role Play <span class="req">*</span></label>
+        <textarea id="improvement" rows="2"
+          placeholder="مثال: البائع قفز للحل قبل فهم حجم الأثر المالي على الإنتاج..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>أقوى لحظة في المكالمة</label>
+        <textarea id="bestMoment" rows="2"
+          placeholder="مثال: سؤال الأثر كان قوياً جداً — 'لو استمر الوضع ٦ شهور على الطاقة الإنتاجية'..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-note">📤 المخرج: بيان احتياج كامل + تغذية راجعة — يُرسَل للمدرب</div>
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+        إرسال البيان والتغذية الراجعة 📤
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>تم الإرسال!</h2>
+  <p>استلم المدرب بيان الاحتياج والتغذية الراجعة.<br>سيناقش أفضل الأمثلة مع الكل.</p>
+  <div class="statement-box" id="statementBox"></div>
+  <p style="font-weight:700;color:var(--navy);margin-top:12px;">
+    هذا البيان سيصبح أساس الـ Proposal في اليوم الثالث 📋⚙️
+  </p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>ZmedCoach © 2026 — <span>ميثاق للتدريب الهندسي</span></footer>
+
+<script>
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+function v(id) { const el=document.getElementById(id); return el?el.value.trim():''; }
+function getRadio(n) { const el=document.querySelector(`input[name="${n}"]:checked`); return el?el.value:''; }
+
+function updatePreview() {
+  const ns1=v('ns1'),ns2=v('ns2'),ns3=v('ns3'),ns4=v('ns4');
+  if(!ns1&&!ns2&&!ns3&&!ns4){
+    document.getElementById('preview').innerHTML='<span class="ph">ابدأ الكتابة وسيظهر البيان هنا...</span>';
+    return;
+  }
+  const f=(val,ph)=>val?`<span class="val">${val}</span>`:`<span class="ph">${ph}</span>`;
+  document.getElementById('preview').innerHTML=
+    `حالياً ${f(ns1,'[الوضع]')} مما يؤدي إلى ${f(ns2,'[الأثر]')} — نريد ${f(ns3,'[الهدف]')} ونقيسه بـ ${f(ns4,'[قياس]')}`;
+}
+
+function collectData() {
+  const ns1=v('ns1'),ns2=v('ns2'),ns3=v('ns3'),ns4=v('ns4');
+  return {
+    timestamp:   new Date().toLocaleString('ar-EG'),
+    name:        v('name'),
+    myRole:      v('myRole'),
+    ns1,ns2,ns3,ns4,
+    statement:   `حالياً ${ns1} مما يؤدي إلى ${ns2} — نريد ${ns3} ونقيسه بـ ${ns4}`,
+    q1:          getRadio('q1'),
+    q2:          getRadio('q2'),
+    q3:          getRadio('q3'),
+    improvement: v('improvement'),
+    bestMoment:  v('bestMoment'),
+  };
+}
+
+function validate(d) {
+  if(!d.name)         return toast('اكتب اسمك أولاً',true);
+  if(!d.myRole)       return toast('اختر دورك في الـ Role Play',true);
+  if(!d.ns1||!d.ns2)  return toast('أكمل الوضع والأثر في بيان الاحتياج',true);
+  if(!d.ns3||!d.ns4)  return toast('أكمل الهدف والقياس في بيان الاحتياج',true);
+  if(!d.improvement)  return toast('اكتب نقطة التحسين الرئيسية',true);
+  return true;
+}
+
+function formatEmail(d) {
+  return `
+━━━━━━━━━━━━━━━━━━━━
+🎭 Role Play اكتشاف — ميثاق الهندسي
+━━━━━━━━━━━━━━━━━━━━
+🕐 ${d.timestamp}
+👤 ${d.name} — ${d.myRole}
+
+━━━ بيان الاحتياج ━━━
+"${d.statement}"
+
+التفاصيل:
+الوضع  → ${d.ns1}
+الأثر   → ${d.ns2}
+الهدف  → ${d.ns3}
+القياس → ${d.ns4}
+
+━━━ التغذية الراجعة ━━━
+التسلسل:          ${d.q1||'لم يجب'}
+التلخيص:          ${d.q2||'لم يجب'}
+الخطوة التالية:  ${d.q3||'لم يجب'}
+نقطة التحسين:    ${d.improvement}
+أقوى لحظة:       ${d.bestMoment||'لم يذكر'}
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
+}
+
+function downloadExcel(d) {
+  const rows=[
+    ['التاريخ','الاسم','الدور',
+     'الوضع','الأثر','الهدف','القياس','البيان الكامل',
+     'التسلسل','التلخيص','الخطوة التالية',
+     'نقطة التحسين','أقوى لحظة'],
+    [d.timestamp,d.name,d.myRole,
+     d.ns1,d.ns2,d.ns3,d.ns4,d.statement,
+     d.q1,d.q2,d.q3,
+     d.improvement,d.bestMoment]
+  ];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=Array(13).fill({wch:26});
+  XLSX.utils.book_append_sheet(wb,ws,'Role Play اكتشاف');
+  XLSX.writeFile(wb,`RolePlay_Discovery_${d.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+async function submitForm() {
+  const d=collectData();
+  if(!validate(d)) return;
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='جاري الإرسال...';
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{
+      to_email:     TRAINER_EMAIL,
+      trainee_name: d.name,
+      my_role:      d.myRole,
+      statement:    d.statement,
+      full_summary: formatEmail(d),
+      timestamp:    d.timestamp,
+    });
+    downloadExcel(d);
+    showSuccess(d);
+  } catch(err) {
+    console.error(err);
+    downloadExcel(d);
+    toast('Excel تم حفظه — راجع إعداد EmailJS',true);
+    btn.disabled=false; btn.textContent='إرسال البيان والتغذية الراجعة 📤';
+  }
+}
+
+function showSuccess(d) {
+  document.getElementById('mainWrap').style.display='none';
+  document.getElementById('successScreen').classList.add('show');
+  document.querySelector('.timer-banner').style.display='none';
+  document.getElementById('statementBox').innerHTML=`
+    <div class="sb-l">📋 بيان الاحتياج — مصنع البتروكيماويات</div>
+    <div class="sb-t">
+      حالياً <span>${d.ns1}</span>
+      مما يؤدي إلى <span>${d.ns2}</span> —
+      نريد <span>${d.ns3}</span>
+      ونقيسه بـ <span>${d.ns4}</span>
+    </div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toast(msg,isErr) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(isErr?' err':'');
+  setTimeout(()=>t.className='toast',3500);
+  return false;
+}
+
+document.addEventListener('change',e=>{
+  if(e.target.type==='radio'){
+    document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r=>{
+      r.closest('.ei-opt').classList.toggle('sel',r.checked);
+    });
+  }
+});
+</script>
+</body>
+</html>
