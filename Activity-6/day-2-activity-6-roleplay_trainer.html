@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقييم Role Play — لوحة المدرب | ميثاق</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy:  #1B3A5C;
+  --red:   #E63946;
+  --blue:  #2D7DD2;
+  --gold:  #C8A96E;
+  --bg:    #EEF4FB;
+  --border:#C9DFF5;
+  --muted: #6B7A8D;
+  --green: #0F7B5A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Cairo',sans-serif;
+  background:var(--navy);
+  color:#fff;
+  direction:rtl;
+  min-height:100vh;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  background:rgba(0,0,0,0.2);
+  padding:12px 24px;
+  display:flex; align-items:center; gap:12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.logo-row { display:flex; align-items:center; gap:8px; }
+.logo-box {
+  width:36px; height:36px; background:#fff;
+  border-radius:7px; display:flex; align-items:center;
+  justify-content:center; font-size:18px; font-weight:900; color:var(--red);
+}
+.logo-text .en { font-size:15px; font-weight:900; color:#fff; }
+.logo-text .en span { color:var(--red); }
+.logo-text .ar { font-size:9px; color:rgba(255,255,255,0.5); }
+.topbar-title {
+  font-size:15px; font-weight:800; color:#fff;
+  margin-right:16px; padding-right:16px;
+  border-right:1px solid rgba(255,255,255,0.2);
+}
+.trainer-badge {
+  background:var(--gold); color:var(--navy);
+  font-size:11px; font-weight:800;
+  padding:3px 12px; border-radius:20px;
+}
+.session-badge {
+  margin-right:auto;
+  background:rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.7);
+  font-size:11px; padding:3px 12px; border-radius:20px;
+}
+
+/* ===== SETUP SCREEN ===== */
+.setup-screen {
+  max-width:560px; margin:0 auto;
+  padding:48px 24px;
+  display:flex; flex-direction:column; gap:20px;
+  align-items:center; text-align:center;
+}
+.setup-icon { font-size:52px; margin-bottom:4px; }
+.setup-screen h2 { font-size:26px; font-weight:900; color:#fff; }
+.setup-screen p { font-size:14px; color:rgba(255,255,255,0.65); line-height:1.7; }
+
+.setup-card {
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:16px; padding:28px;
+  width:100%; display:flex; flex-direction:column; gap:14px;
+}
+.setup-field { display:flex; flex-direction:column; gap:6px; text-align:right; }
+.setup-field label { font-size:13px; font-weight:700; color:var(--gold); }
+.setup-field input, .setup-field select {
+  font-family:'Cairo',sans-serif; font-size:14px; color:var(--navy);
+  background:#fff; border:none; border-radius:10px;
+  padding:11px 14px; outline:none; direction:rtl; width:100%;
+}
+.setup-field input::placeholder { color:#aaa; }
+.fg2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:480px){ .fg2 { grid-template-columns:1fr; } }
+.btn-start {
+  font-family:'Cairo',sans-serif; font-size:16px; font-weight:900;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:14px; cursor:pointer;
+  transition:all 0.2s; width:100%;
+}
+.btn-start:hover { background:#c92d38; transform:translateY(-1px); }
+
+/* ===== EVAL SCREEN ===== */
+.eval-screen { display:none; padding:20px 24px; max-width:960px; margin:0 auto; }
+.eval-screen.show { display:block; }
+
+/* Trainee header */
+.trainee-header {
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:14px; padding:16px 20px;
+  display:flex; align-items:center; gap:16px;
+  margin-bottom:20px;
+}
+.trainee-avatar {
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  border:2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; font-weight:900; color:#fff; flex-shrink:0;
+}
+.trainee-info .tn { font-size:20px; font-weight:900; color:#fff; }
+.trainee-info .ts { font-size:12px; color:rgba(255,255,255,0.55); margin-top:2px; }
+.live-badge {
+  margin-right:auto;
+  display:flex; align-items:center; gap:6px;
+  background:rgba(230,57,70,0.2);
+  border:1px solid rgba(230,57,70,0.4);
+  color:var(--red); font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:20px;
+}
+.live-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--red); animation:pulse 1.2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.btn-new {
+  font-family:'Cairo',sans-serif; font-size:12px; font-weight:700;
+  background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);
+  border-radius:8px; padding:7px 14px; cursor:pointer; transition:all 0.2s;
+}
+.btn-new:hover { background:rgba(255,255,255,0.18); }
+
+/* Main layout */
+.eval-layout {
+  display:grid; grid-template-columns:1fr 280px; gap:16px;
+  align-items:start;
+}
+@media(max-width:700px){ .eval-layout { grid-template-columns:1fr; } }
+
+/* Criteria list */
+.criteria-list { display:flex; flex-direction:column; gap:8px; }
+.criterion {
+  background:rgba(255,255,255,0.05);
+  border:2px solid rgba(255,255,255,0.1);
+  border-radius:12px; padding:14px 16px;
+  display:flex; align-items:center; gap:14px;
+  cursor:pointer; transition:all 0.25s;
+  user-select:none;
+}
+.criterion:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); }
+.criterion.yes {
+  background:rgba(15,123,90,0.2);
+  border-color:rgba(15,200,140,0.4);
+}
+.criterion.no {
+  background:rgba(230,57,70,0.1);
+  border-color:rgba(230,57,70,0.3);
+}
+
+.cr-num {
+  width:32px; height:32px; border-radius:9px;
+  background:rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6); font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all 0.2s;
+}
+.criterion.yes .cr-num { background:var(--green); color:#fff; }
+.criterion.no  .cr-num { background:var(--red);   color:#fff; }
+
+.cr-text {
+  flex:1; font-size:14px; font-weight:600; color:rgba(255,255,255,0.75);
+  line-height:1.4; transition:all 0.2s;
+}
+.cr-text em { font-style:normal; color:var(--gold); font-weight:800; }
+.criterion.yes .cr-text { color:#fff; }
+.criterion.no  .cr-text { color:rgba(255,255,255,0.5); }
+
+.cr-btn-group {
+  display:flex; gap:6px; flex-shrink:0;
+}
+.cr-btn {
+  width:38px; height:38px; border-radius:9px; border:none; cursor:pointer;
+  font-size:18px; display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s; background:rgba(255,255,255,0.08);
+}
+.cr-btn:hover { transform:scale(1.1); }
+.cr-btn.yes-btn:hover, .criterion.yes .cr-btn.yes-btn { background:rgba(15,200,140,0.3); }
+.cr-btn.no-btn:hover,  .criterion.no  .cr-btn.no-btn  { background:rgba(230,57,70,0.3); }
+.criterion.yes .cr-btn.yes-btn { box-shadow:0 0 0 2px rgba(15,200,140,0.5); }
+.criterion.no  .cr-btn.no-btn  { box-shadow:0 0 0 2px rgba(230,57,70,0.4); }
+
+/* ===== RIGHT PANEL ===== */
+.right-panel { display:flex; flex-direction:column; gap:12px; position:sticky; top:20px; }
+
+/* Score card */
+.score-card {
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:16px; padding:20px;
+  text-align:center;
+}
+.sc-label { font-size:11px; font-weight:800; color:var(--gold); margin-bottom:10px; }
+.sc-ring-wrap { position:relative; width:120px; height:120px; margin:0 auto 12px; }
+.sc-ring-wrap svg { width:100%; height:100%; transform:rotate(-90deg); }
+.sc-ring-bg   { fill:none; stroke:rgba(255,255,255,0.08); stroke-width:10; }
+.sc-ring-fill { fill:none; stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 0.6s ease, stroke 0.4s; }
+.sc-number {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:32px; font-weight:900; color:#fff; line-height:1;
+}
+.sc-number span { font-size:14px; color:rgba(255,255,255,0.45); }
+.sc-out-of { font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:8px; }
+.sc-verdict {
+  font-size:13px; font-weight:800; padding:6px 16px;
+  border-radius:20px; display:inline-block;
+  transition:all 0.4s;
+}
+
+/* Bars */
+.bars-row {
+  display:flex; gap:5px; justify-content:center; margin-top:10px;
+}
+.bar {
+  height:8px; flex:1; border-radius:4px;
+  background:rgba(255,255,255,0.1); transition:background 0.4s;
+}
+
+/* Notes */
+.notes-card {
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:14px; padding:16px;
+}
+.nc-label { font-size:12px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+.nc-textarea {
+  font-family:'Cairo',sans-serif; font-size:12px; color:#fff;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px; padding:9px 11px;
+  outline:none; resize:vertical; width:100%; min-height:80px;
+  direction:rtl;
+}
+.nc-textarea::placeholder { color:rgba(255,255,255,0.3); }
+.nc-textarea:focus { border-color:var(--gold); }
+
+/* Submit */
+.btn-submit {
+  font-family:'Cairo',sans-serif; font-size:14px; font-weight:800;
+  background:var(--red); color:#fff; border:none;
+  border-radius:12px; padding:13px; cursor:pointer;
+  transition:all 0.2s; width:100%;
+}
+.btn-submit:hover { background:#c92d38; }
+.btn-submit:disabled { opacity:0.5; cursor:not-allowed; }
+
+/* ===== RESULTS HISTORY ===== */
+.history-section {
+  max-width:960px; margin:24px auto 0;
+  padding:0 24px 40px;
+}
+.history-title {
+  font-size:14px; font-weight:800; color:var(--gold);
+  margin-bottom:12px; display:flex; align-items:center; gap:8px;
+}
+.history-grid { display:flex; flex-direction:column; gap:8px; }
+.history-item {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px; padding:12px 16px;
+  display:flex; align-items:center; gap:14px;
+}
+.hi-name { font-size:14px; font-weight:700; color:#fff; flex:1; }
+.hi-score { font-size:20px; font-weight:900; }
+.hi-verdict { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+.hi-time { font-size:11px; color:rgba(255,255,255,0.4); }
+.hi-bars { display:flex; gap:3px; }
+.hi-bar { width:14px; height:6px; border-radius:3px; background:rgba(255,255,255,0.1); }
+
+/* Export button */
+.btn-export {
+  font-family:'Cairo',sans-serif; font-size:13px; font-weight:700;
+  background:rgba(200,169,110,0.15); color:var(--gold);
+  border:1px solid var(--gold); border-radius:8px;
+  padding:6px 14px; cursor:pointer; transition:all 0.2s;
+}
+.btn-export:hover { background:rgba(200,169,110,0.25); }
+
+/* ===== TOAST ===== */
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:#fff; color:var(--navy);
+  padding:12px 24px; border-radius:12px;
+  font-size:13px; font-weight:700; z-index:999;
+  box-shadow:0 8px 28px rgba(0,0,0,0.3);
+  opacity:0; transition:opacity 0.3s; pointer-events:none;
+}
+.toast.show { opacity:1; }
+
+/* No history */
+.no-history { font-size:13px; color:rgba(255,255,255,0.3); text-align:center; padding:16px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo-row">
+    <div class="logo-box">Z</div>
+    <div class="logo-text">
+      <div class="en"><span>Z</span>medCoach</div>
+      <div class="ar">زمدكوتش للتدريب</div>
+    </div>
+  </div>
+  <div class="topbar-title">تقييم Role Play — Cold Calling</div>
+  <div class="trainer-badge">🎓 لوحة المدرب</div>
+  <div class="session-badge" id="sessionTime">جلسة تدريبية</div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-icon">📋</div>
+  <h2>ابدأ تقييم متدرب جديد</h2>
+  <p>سجّل اسم المتدرب واضغط ابدأ التقييم<br>ثم اضغط على المعايير أثناء المكالمة</p>
+
+  <div class="setup-card">
+    <div class="fg2">
+      <div class="setup-field">
+        <label>اسم المتدرب *</label>
+        <input type="text" id="traineeName" placeholder="مثال: أحمد محمد">
+      </div>
+      <div class="setup-field">
+        <label>نوع التقييم</label>
+        <select id="evalType">
+          <option>افتتاح + اعتراض</option>
+          <option>مكالمة كاملة</option>
+          <option>إغلاق فقط</option>
+        </select>
+      </div>
+    </div>
+    <div class="setup-field">
+      <label>ملاحظة مسبقة (اختياري)</label>
+      <input type="text" id="preNote" placeholder="مثال: المتدرب خجول — راقب النبرة">
+    </div>
+    <button class="btn-start" onclick="startEval()">ابدأ التقييم ▶</button>
+  </div>
+</div>
+
+<!-- EVAL SCREEN -->
+<div class="eval-screen" id="evalScreen">
+
+  <!-- Trainee header -->
+  <div class="trainee-header">
+    <div class="trainee-avatar" id="avatarLetter">م</div>
+    <div class="trainee-info">
+      <div class="tn" id="traineeDisplay">—</div>
+      <div class="ts" id="evalTypeDisplay">—</div>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      تقييم مباشر
+    </div>
+    <button class="btn-new" onclick="resetToSetup()">+ متدرب جديد</button>
+  </div>
+
+  <div class="eval-layout">
+
+    <!-- LEFT: Criteria -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);margin-bottom:10px;">
+        اضغط ✅ أو ❌ لكل معيار أثناء المكالمة
+      </div>
+      <div class="criteria-list" id="criteriaList">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+
+    <!-- RIGHT: Score + Notes -->
+    <div class="right-panel">
+
+      <!-- Score Ring -->
+      <div class="score-card">
+        <div class="sc-label">النتيجة اللحظية</div>
+        <div class="sc-ring-wrap">
+          <svg viewBox="0 0 120 120">
+            <circle class="sc-ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="sc-ring-fill" id="ringFill" cx="60" cy="60" r="50"
+              stroke-dasharray="314" stroke-dashoffset="314"/>
+          </svg>
+          <div class="sc-number" id="scoreNumber">٠<span>/٧</span></div>
+        </div>
+        <div class="sc-out-of" id="scoreOut">٠ من ٧ معايير</div>
+        <div class="sc-verdict" id="scoreVerdict" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);">
+          في انتظار التقييم...
+        </div>
+        <div class="bars-row" id="scoreBars">
+          <!-- 7 bars -->
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="notes-card">
+        <div class="nc-label">📝 ملاحظات المدرب</div>
+        <textarea class="nc-textarea" id="trainerNotes"
+          placeholder="اكتب ملاحظاتك أثناء المكالمة..."></textarea>
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-submit" id="submitBtn" onclick="submitEval()">
+        حفظ النتيجة + إرسال 📤
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS HISTORY -->
+<div class="history-section" id="historySection" style="display:none;">
+  <div class="history-title">
+    📊 نتائج الجلسة
+    <button class="btn-export" onclick="exportAll()">تصدير Excel</button>
+  </div>
+  <div class="history-grid" id="historyGrid">
+    <div class="no-history">لا توجد نتائج بعد</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONFIG =====
+const EMAILJS_SERVICE_ID  = 'zmedcoach gmail';
+const EMAILJS_TEMPLATE_ID = 'template_nd7d6ab';
+const EMAILJS_PUBLIC_KEY  = 'EU2gMQj29rALzRFlx';
+const TRAINER_EMAIL       = 'zmedcoach@gmail.com';
+
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ===== CRITERIA =====
+const CRITERIA = [
+  { id:'c1', text:'الافتتاح أقل من <em>٢٥ ثانية</em>' },
+  { id:'c2', text:'ذكر <em>سبب مرتبط بسياق العميل</em>' },
+  { id:'c3', text:'انتهى بـ <em>سؤال</em> وليس بجملة مفتوحة' },
+  { id:'c4', text:'تعامل مع <em>"مشغول"</em> بخيارين للموعد' },
+  { id:'c5', text:'سأل <em>سؤالين</em> قبل "أرسل التفاصيل"' },
+  { id:'c6', text:'طلب <em>خطوة تالية واضحة</em> في النهاية' },
+  { id:'c7', text:'النبرة <em>واثقة</em> وغير هجومية' },
+];
+
+// ===== STATE =====
+let state = {};  // { c1: null/true/false, ... }
+let sessionResults = [];
+let currentTrainee = '';
+let sessionStart = new Date();
+
+// ===== INIT TIME =====
+function updateTime() {
+  const now = new Date();
+  document.getElementById('sessionTime').textContent =
+    now.toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// ===== BUILD CRITERIA UI =====
+function buildCriteria() {
+  const list = document.getElementById('criteriaList');
+  list.innerHTML = '';
+  const bars = document.getElementById('scoreBars');
+  bars.innerHTML = '';
+
+  CRITERIA.forEach((c, i) => {
+    // criterion row
+    const div = document.createElement('div');
+    div.className = 'criterion';
+    div.id = 'row-' + c.id;
+    div.innerHTML = `
+      <div class="cr-num" id="num-${c.id}">${i+1}</div>
+      <div class="cr-text">${c.text}</div>
+      <div class="cr-btn-group">
+        <button class="cr-btn yes-btn" onclick="mark('${c.id}',true)" title="حدث ✅">✅</button>
+        <button class="cr-btn no-btn"  onclick="mark('${c.id}',false)" title="لم يحدث ❌">❌</button>
+      </div>
+    `;
+    list.appendChild(div);
+
+    // bar
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.id = 'bar-' + c.id;
+    bars.appendChild(bar);
+  });
+}
+
+// ===== MARK CRITERION =====
+function mark(id, value) {
+  state[id] = value;
+  const row = document.getElementById('row-' + id);
+  const bar = document.getElementById('bar-' + id);
+
+  row.classList.remove('yes', 'no');
+  row.classList.add(value ? 'yes' : 'no');
+
+  if (value) {
+    bar.style.background = '#0FC88C';
+  } else {
+    bar.style.background = 'rgba(230,57,70,0.6)';
+  }
+
+  updateScore();
+}
+
+// ===== UPDATE SCORE =====
+function updateScore() {
+  const answered = Object.keys(state).filter(k => state[k] !== null && state[k] !== undefined);
+  const yesCount = answered.filter(k => state[k] === true).length;
+  const total = CRITERIA.length;
+  const pct = yesCount / total;
+
+  // Ring
+  const circumference = 314;
+  const offset = circumference - (pct * circumference);
+  const ring = document.getElementById('ringFill');
+  ring.style.strokeDashoffset = offset;
+
+  // Color
+  let color, verdictText, verdictBg, verdictColor;
+  if (answered.length === 0) {
+    color = 'rgba(255,255,255,0.2)';
+    verdictText = 'في انتظار التقييم...';
+    verdictBg = 'rgba(255,255,255,0.08)';
+    verdictColor = 'rgba(255,255,255,0.4)';
+  } else if (yesCount >= 6) {
+    color = '#0FC88C';
+    verdictText = '🏆 أداء احترافي ممتاز!';
+    verdictBg = 'rgba(15,200,140,0.15)';
+    verdictColor = '#0FC88C';
+  } else if (yesCount >= 5) {
+    color = '#4DB8FF';
+    verdictText = '✅ أداء جيد — استمر';
+    verdictBg = 'rgba(77,184,255,0.15)';
+    verdictColor = '#4DB8FF';
+  } else if (yesCount >= 3) {
+    color = '#C8A96E';
+    verdictText = '⚠️ يحتاج تطوير';
+    verdictBg = 'rgba(200,169,110,0.15)';
+    verdictColor = '#C8A96E';
+  } else {
+    color = '#E63946';
+    verdictText = '🔴 يحتاج مزيداً من التدريب';
+    verdictBg = 'rgba(230,57,70,0.15)';
+    verdictColor = '#E63946';
+  }
+
+  ring.style.stroke = color;
+  document.getElementById('scoreNumber').innerHTML = `${toArabicNum(yesCount)}<span>/${toArabicNum(total)}</span>`;
+  document.getElementById('scoreOut').textContent = `${toArabicNum(yesCount)} من ${toArabicNum(total)} معايير`;
+  const v = document.getElementById('scoreVerdict');
+  v.textContent = verdictText;
+  v.style.background = verdictBg;
+  v.style.color = verdictColor;
+}
+
+// ===== ARABIC NUMBERS =====
+function toArabicNum(n) {
+  return n.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+}
+
+// ===== START EVAL =====
+function startEval() {
+  const name = document.getElementById('traineeName').value.trim();
+  if (!name) { toast('اكتب اسم المتدرب أولاً'); return; }
+
+  currentTrainee = name;
+  const evalType = document.getElementById('evalType').value;
+
+  // Reset state
+  state = {};
+  CRITERIA.forEach(c => state[c.id] = null);
+
+  // Build UI
+  buildCriteria();
+
+  // Set header
+  document.getElementById('traineeDisplay').textContent = name;
+  document.getElementById('evalTypeDisplay').textContent = evalType + ' — ميثاق للتدريب';
+  document.getElementById('avatarLetter').textContent = name.charAt(0);
+  document.getElementById('trainerNotes').value = document.getElementById('preNote').value;
+
+  // Show eval
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('evalScreen').classList.add('show');
+  updateScore();
+}
+
+// ===== RESET =====
+function resetToSetup() {
+  document.getElementById('traineeName').value = '';
+  document.getElementById('preNote').value = '';
+  document.getElementById('setupScreen').style.display = '';
+  document.getElementById('evalScreen').classList.remove('show');
+}
+
+// ===== SUBMIT =====
+async function submitEval() {
+  const answered = Object.values(state).filter(v => v !== null).length;
+  if (answered < 4) { toast('قيّم ٤ معايير على الأقل قبل الحفظ'); return; }
+
+  const yesCount = Object.values(state).filter(v => v === true).length;
+  const notes = document.getElementById('trainerNotes').value.trim();
+  const evalType = document.getElementById('evalTypeDisplay').textContent;
+  const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'});
+
+  const result = {
+    name: currentTrainee,
+    evalType,
+    score: yesCount,
+    total: CRITERIA.length,
+    criteria: CRITERIA.map(c => ({
+      text: c.text.replace(/<em>|<\/em>/g,''),
+      value: state[c.id]
+    })),
+    notes,
+    time,
+    timestamp: new Date().toLocaleString('ar-EG'),
+  };
+
+  sessionResults.push(result);
+  updateHistory();
+
+  // Send email
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:     TRAINER_EMAIL,
+      trainee_name: result.name,
+      score:        `${result.score}/${result.total}`,
+      full_summary: formatEmail(result),
+      timestamp:    result.timestamp,
+    });
+    toast('✅ تم حفظ وإرسال نتيجة ' + result.name);
+  } catch(e) {
+    toast('تم الحفظ محلياً — راجع EmailJS');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'حفظ النتيجة + إرسال 📤';
+
+  // Go back to setup for next trainee
+  setTimeout(() => resetToSetup(), 1200);
+}
+
+// ===== FORMAT EMAIL =====
+function formatEmail(r) {
+  const lines = r.criteria.map((c,i) => {
+    const icon = c.value === true ? '✅' : c.value === false ? '❌' : '⬜';
+    return `${icon} ${i+1}. ${c.text}`;
+  }).join('\n');
+  const verdict = r.score >= 6 ? 'أداء احترافي ممتاز' :
+                  r.score >= 5 ? 'أداء جيد' :
+                  r.score >= 3 ? 'يحتاج تطوير' : 'يحتاج مزيداً من التدريب';
+  return `
+━━━━━━━━━━━━━━━━━━━━
+📋 تقييم Role Play — Cold Calling
+━━━━━━━━━━━━━━━━━━━━
+🕐 ${r.timestamp}
+👤 المتدرب: ${r.name}
+📊 النتيجة: ${r.score}/${r.total} — ${verdict}
+
+━━━ المعايير ━━━
+${lines}
+
+📝 ملاحظات المدرب:
+${r.notes || 'لا توجد'}
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
+}
+
+// ===== UPDATE HISTORY =====
+function updateHistory() {
+  const section = document.getElementById('historySection');
+  const grid    = document.getElementById('historyGrid');
+  section.style.display = 'block';
+  grid.innerHTML = '';
+
+  sessionResults.slice().reverse().forEach(r => {
+    const pct = r.score / r.total;
+    const color = pct >= 6/7 ? '#0FC88C' : pct >= 5/7 ? '#4DB8FF' : pct >= 3/7 ? '#C8A96E' : '#E63946';
+    const verdict = r.score >= 6 ? 'ممتاز 🏆' : r.score >= 5 ? 'جيد ✅' : r.score >= 3 ? 'يحتاج تطوير ⚠️' : 'ضعيف 🔴';
+
+    const bars = r.criteria.map(c => {
+      const bg = c.value === true ? '#0FC88C' : c.value === false ? 'rgba(230,57,70,0.6)' : 'rgba(255,255,255,0.1)';
+      return `<div class="hi-bar" style="background:${bg}"></div>`;
+    }).join('');
+
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `
+      <div class="hi-name">${r.name}</div>
+      <div class="hi-bars">${bars}</div>
+      <div class="hi-score" style="color:${color}">${toArabicNum(r.score)}<span style="font-size:13px;opacity:0.5">/${toArabicNum(r.total)}</span></div>
+      <div class="hi-verdict" style="background:${color}22;color:${color}">${verdict}</div>
+      <div class="hi-time">${r.time}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ===== EXPORT ALL =====
+function exportAll() {
+  if (sessionResults.length === 0) { toast('لا توجد نتائج للتصدير'); return; }
+
+  const criteriaHeaders = CRITERIA.map((c,i) => `${i+1}. ${c.text.replace(/<em>|<\/em>/g,'')}`);
+  const headers = ['الاسم', 'النتيجة', 'من', 'الوقت', ...criteriaHeaders, 'ملاحظات'];
+
+  const rows = sessionResults.map(r => [
+    r.name,
+    r.score,
+    r.total,
+    r.time,
+    ...r.criteria.map(c => c.value === true ? '✅' : c.value === false ? '❌' : '—'),
+    r.notes,
+  ]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws['!cols'] = [{wch:20},{wch:8},{wch:6},{wch:10},
+    ...CRITERIA.map(()=>({wch:36})), {wch:40}];
+  XLSX.utils.book_append_sheet(wb, ws, 'نتائج Role Play');
+  XLSX.writeFile(wb, `RolePlay_Results_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast('تم تصدير النتائج Excel ✅');
+}
+
+// ===== TOAST =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show';
+  setTimeout(() => t.className = 'toast', 3000);
+}
+</script>
+</body>
+</html>
